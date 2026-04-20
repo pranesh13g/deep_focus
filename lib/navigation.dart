@@ -1,3 +1,4 @@
+import 'package:deep_focus/core/constant/app_colors.dart';
 import 'package:deep_focus/features/Focus/presentation/screens/presentation_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -34,12 +35,19 @@ class _NavigationState extends State<Navigation> {
         currentIndex: selectedIndex,
         onTap: onItemTapped,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF743DFF),
-        unselectedItemColor: Colors.grey,
+        backgroundColor: AppColors.neutral,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.secondary,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Discover"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.center_focus_strong),
+            label: "FOCUS",
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.waves), label: "SOUNDS"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "SETTINGS",
+          ),
         ],
       ),
     );
