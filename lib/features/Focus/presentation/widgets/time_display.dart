@@ -54,17 +54,6 @@ class TimerDisplay extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 20.h),
-
-        Text(
-          'Stay in the flow',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textSecondary,
-          ),
-        ),
       ],
     );
   }

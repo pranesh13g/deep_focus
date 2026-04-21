@@ -1,5 +1,6 @@
 import 'package:deep_focus/core/widgets/app_bar.dart';
 import 'package:deep_focus/features/Focus/presentation/widgets/round_indicator.dart';
+import 'package:deep_focus/features/Focus/presentation/widgets/sound_player.dart';
 import 'package:deep_focus/features/Focus/presentation/widgets/time_display.dart';
 import 'package:deep_focus/features/Focus/presentation/providers/timer_provider.dart';
 import 'package:deep_focus/features/Focus/presentation/widgets/timer_action.dart';
@@ -34,17 +35,28 @@ class _DeepWorkSessionView extends StatelessWidget {
             children: [
               AppBar(),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    RoundIndicator(),
-                    SizedBox(height: 72.h),
-                    TimerDisplay(),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 50.h),
+                      RoundIndicator(),
+                      SizedBox(height: 50.h),
+                      TimerDisplay(),
+                      SizedBox(height: 24.h),
+                      TimerAction(),
+                      SizedBox(height: 24.h),
+                      SoundPlayer(
+                        label: 'Current Soundscape',
+                        title: 'Midnight Forest',
+                        isPlaying: true,
+                        onPlayPause: () {
+                          // toggle play/pause
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              TimerAction(),
-              SizedBox(height: 24.h),
             ],
           ),
         ),

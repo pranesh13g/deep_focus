@@ -8,4 +8,7 @@ class AppColors {
 
   static const textPrimary = Color(0xFF222222);
   static const textSecondary = Color(0xFF6B6B6B);
+
+  static const lightBlue = Color(0xFFDFF4FF);
+  static const lightGray = Color(0xFFF1F1ED);
 }

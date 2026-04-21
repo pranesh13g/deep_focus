@@ -2,6 +2,7 @@ import 'package:deep_focus/core/constant/app_colors.dart';
 import 'package:deep_focus/features/Focus/presentation/providers/timer_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class TimerAction extends StatelessWidget {
@@ -22,56 +23,98 @@ class TimerAction extends StatelessWidget {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40.r),
-              ),
             ),
-            child: Text(
-              isRunning ? 'Pause Session' : 'Resume Session',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                  color: Colors.white,
+                  size: 18.sp,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  isRunning ? 'Pause Session' : 'Resume Session',
+                  style: TextStyle(
+                    fontFamily: GoogleFonts.inter().fontFamily,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
         SizedBox(height: 20.h),
+
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            GestureDetector(
-              onTap: () => context.read<TimerProvider>().restartSession(),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.refresh_rounded,
-                    color: AppColors.textSecondary,
-                    size: 18.sp,
+            Expanded(
+              child: SizedBox(
+                height: 80.h,
+                child: ElevatedButton(
+                  onPressed: () =>
+                      context.read<TimerProvider>().restartSession(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.lightBlue,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
                   ),
-                  SizedBox(width: 6.w),
-                  Text(
-                    'Restart Session',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.refresh_rounded,
+                        color: AppColors.textSecondary,
+                        size: 18.sp,
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        'Restart',
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.inter().fontFamily,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                'End Session',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFFB85C5C),
+            SizedBox(width: 6.w),
+            Expanded(
+              child: SizedBox(
+                height: 80.h,
+                child: ElevatedButton(
+                  onPressed: () => {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.lightGray,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.skip_next_rounded,
+                        color: AppColors.textSecondary,
+                        size: 18.sp,
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        'Skip',
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.inter().fontFamily,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
