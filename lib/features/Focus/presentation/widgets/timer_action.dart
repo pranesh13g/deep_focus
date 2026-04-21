@@ -10,10 +10,12 @@ class TimerAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRunning = context.select<TimerProvider, bool>((p) => p.isRunning);
+    final isRunning =
+        context.select<TimerProvider, bool>((p) => p.isRunning);
 
     return Column(
       children: [
+        // ── Pause / Resume ──────────────────────────────────────────
         SizedBox(
           width: double.infinity,
           height: 64.h,
@@ -23,6 +25,9 @@ class TimerAction extends StatelessWidget {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -30,9 +35,9 @@ class TimerAction extends StatelessWidget {
                 Icon(
                   isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   color: Colors.white,
-                  size: 18.sp,
+                  size: 20.sp,
                 ),
-                SizedBox(width: 4.w),
+                SizedBox(width: 6.w),
                 Text(
                   isRunning ? 'Pause Session' : 'Resume Session',
                   style: TextStyle(
@@ -46,20 +51,25 @@ class TimerAction extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 20.h),
 
+        SizedBox(height: 12.h),
+
+        // ── Reset + Skip ────────────────────────────────────────────
         Row(
           children: [
+            // Reset
             Expanded(
               child: SizedBox(
-                height: 80.h,
+                height: 72.h,
                 child: ElevatedButton(
-                  onPressed: () =>
-                      context.read<TimerProvider>().restartSession(),
+                  onPressed: () => context.read<TimerProvider>().reset(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.lightBlue,
                     foregroundColor: Colors.white,
                     elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -67,14 +77,14 @@ class TimerAction extends StatelessWidget {
                       Icon(
                         Icons.refresh_rounded,
                         color: AppColors.textSecondary,
-                        size: 18.sp,
+                        size: 20.sp,
                       ),
                       SizedBox(height: 4.h),
                       Text(
-                        'Restart',
+                        'Reset',
                         style: TextStyle(
                           fontFamily: GoogleFonts.inter().fontFamily,
-                          fontSize: 10.sp,
+                          fontSize: 11.sp,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textSecondary,
                         ),
@@ -84,16 +94,22 @@ class TimerAction extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 6.w),
+
+            SizedBox(width: 8.w),
+
+            // Skip
             Expanded(
               child: SizedBox(
-                height: 80.h,
+                height: 72.h,
                 child: ElevatedButton(
-                  onPressed: () => {},
+                  onPressed: () => context.read<TimerProvider>().skip(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.lightGray,
                     foregroundColor: Colors.white,
                     elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -101,14 +117,14 @@ class TimerAction extends StatelessWidget {
                       Icon(
                         Icons.skip_next_rounded,
                         color: AppColors.textSecondary,
-                        size: 18.sp,
+                        size: 20.sp,
                       ),
                       SizedBox(height: 4.h),
                       Text(
                         'Skip',
                         style: TextStyle(
                           fontFamily: GoogleFonts.inter().fontFamily,
-                          fontSize: 10.sp,
+                          fontSize: 11.sp,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textSecondary,
                         ),

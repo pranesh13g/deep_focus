@@ -1,5 +1,7 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
 import 'package:deep_focus/features/Focus/presentation/screens/presentation_screen.dart';
+import 'package:deep_focus/features/settings/presentation/screens/settings_screen.dart';
+import 'package:deep_focus/features/sounds/presentation/screens/sounds_screen.dart';
 import 'package:flutter/material.dart';
 
 class Navigation extends StatefulWidget {
@@ -16,9 +18,8 @@ class _NavigationState extends State<Navigation> {
 
   final List<Widget> screens = [
     const PresentationScreen(),
-    Placeholder(),
-    Placeholder(),
-    Placeholder(),
+    const SoundsScreen(),
+    const SettingsScreen(),
   ];
 
   void onItemTapped(int index) {

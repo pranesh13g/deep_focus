@@ -9,21 +9,48 @@ class RoundIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final round = context.select<TimerProvider, int>((p) => p.currentRound);
+    final round =
+        context.select<TimerProvider, int>((p) => p.currentRound);
+    final total =
+        context.select<TimerProvider, int>((p) => p.totalRounds);
+    final phaseLabel =
+        context.select<TimerProvider, String>((p) => p.phaseLabel);
+    final phase =
+        context.select<TimerProvider, TimerPhase>((p) => p.phase);
+
+    // Pick accent color per phase
+    final Color phaseColor = switch (phase) {
+      TimerPhase.work => AppColors.primary,
+      TimerPhase.shortBreak => const Color(0xFF66BB6A),
+      TimerPhase.longBreak => const Color(0xFF5C6BC0),
+    };
 
     return Column(
       children: [
-        Text(
-          'DEEP WORK SESSION',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 3.w,
-            color: AppColors.textSecondary,
+        // Phase chip
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: phaseColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: phaseColor.withValues(alpha: 0.3)),
+          ),
+          child: Text(
+            phaseLabel,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 2.w,
+              color: phaseColor,
+            ),
           ),
         ),
-        SizedBox(height: 12.h),
+
+        SizedBox(height: 14.h),
+
+        // Round divider row
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -35,7 +62,7 @@ class RoundIndicator extends StatelessWidget {
               ),
             ),
             Text(
-              'Round $round of ${TimerProvider.totalRounds}',
+              'Round $round of $total',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14.sp,

@@ -1,12 +1,10 @@
 import 'package:deep_focus/core/widgets/app_bar.dart';
 import 'package:deep_focus/features/Focus/presentation/widgets/round_indicator.dart';
-import 'package:deep_focus/features/Focus/presentation/widgets/sound_player.dart';
+import 'package:deep_focus/features/Focus/presentation/widgets/focus_sound_player.dart';
 import 'package:deep_focus/features/Focus/presentation/widgets/time_display.dart';
-import 'package:deep_focus/features/Focus/presentation/providers/timer_provider.dart';
 import 'package:deep_focus/features/Focus/presentation/widgets/timer_action.dart';
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 import 'package:deep_focus/core/constant/app_colors.dart';
 
 class PresentationScreen extends StatelessWidget {
@@ -14,10 +12,8 @@ class PresentationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TimerProvider(),
-      child: const _DeepWorkSessionView(),
-    );
+    // TimerProvider is now global — no local ChangeNotifierProvider needed
+    return const _DeepWorkSessionView();
   }
 }
 
@@ -39,20 +35,13 @@ class _DeepWorkSessionView extends StatelessWidget {
                   child: Column(
                     children: [
                       SizedBox(height: 50.h),
-                      RoundIndicator(),
+                      const RoundIndicator(),
                       SizedBox(height: 50.h),
-                      TimerDisplay(),
+                      const TimerDisplay(),
                       SizedBox(height: 24.h),
-                      TimerAction(),
+                      const TimerAction(),
                       SizedBox(height: 24.h),
-                      SoundPlayer(
-                        label: 'Current Soundscape',
-                        title: 'Midnight Forest',
-                        isPlaying: true,
-                        onPlayPause: () {
-                          // toggle play/pause
-                        },
-                      ),
+                      const FocusSoundPlayer(),
                     ],
                   ),
                 ),
