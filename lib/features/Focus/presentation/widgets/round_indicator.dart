@@ -29,7 +29,7 @@ class RoundIndicator extends StatelessWidget {
           children: [
             Expanded(
               child: Divider(
-                color: AppColors.secondary.withOpacity(0.4),
+                color: AppColors.secondary.withValues(alpha: 0.4),
                 thickness: 1,
                 endIndent: 12.w,
               ),
@@ -45,7 +45,7 @@ class RoundIndicator extends StatelessWidget {
             ),
             Expanded(
               child: Divider(
-                color: AppColors.secondary.withOpacity(0.4),
+                color: AppColors.secondary.withValues(alpha: 0.4),
                 thickness: 1,
                 indent: 12.w,
               ),
