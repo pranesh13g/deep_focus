@@ -34,14 +34,15 @@ class _DeepWorkSessionView extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: 50.h),
+                      SizedBox(height: 25.h),
                       const RoundIndicator(),
-                      SizedBox(height: 50.h),
+                      SizedBox(height: 25.h),
                       const TimerDisplay(),
                       SizedBox(height: 24.h),
                       const TimerAction(),
                       SizedBox(height: 24.h),
                       const FocusSoundPlayer(),
+                      SizedBox(height: 24.h),
                     ],
                   ),
                 ),
