@@ -1,5 +1,5 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
-import 'package:deep_focus/features/Focus/presentation/providers/timer_provider.dart';
+import 'package:deep_focus/features/Focus/viewmodel/timer_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
