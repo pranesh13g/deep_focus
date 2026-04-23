@@ -1,4 +1,4 @@
-import 'package:deep_focus/features/sounds/model/sound_model.dart';
+import 'package:deep_focus/features/sounds/models/sound_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 

@@ -1,6 +1,6 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
-import 'package:deep_focus/features/settings/viewmodel/settings_provider.dart';
-import 'package:deep_focus/features/settings/view/widgets/slider_row.dart';
+import 'package:deep_focus/features/settings/viewmodels/settings_provider.dart';
+import 'package:deep_focus/features/settings/widgets/slider_row.dart';
 import 'package:deep_focus/features/Focus/viewmodels/timer_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

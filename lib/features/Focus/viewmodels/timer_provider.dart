@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:deep_focus/features/settings/viewmodel/settings_provider.dart';
+import 'package:deep_focus/features/settings/viewmodels/settings_provider.dart';
 import 'package:flutter/material.dart';
 
 enum TimerPhase { work, shortBreak, longBreak }
