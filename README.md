@@ -1,18 +1,60 @@
-# deep_focus
+# Deep Focus
 
-A new Flutter project.
+A minimalist and beautiful productivity app built with Flutter, designed to help users maintain focus through timed work sessions and ambient background sounds.
 
-## Getting Started
+## 🚀 Features
 
-This project is a starting point for a Flutter application.
+- **Pomodoro Timer**: Customizable work and break intervals.
+- **Ambient Sounds**: High-quality background audio (Rain, Forest, White Noise, etc.).
+- **Modern UI**: Sleek, glassmorphic design with smooth animations.
+- **Settings**: Fully configurable session lengths and preferences.
 
-A few resources to get you started if this is your first Flutter project:
+## 🏗 Architecture
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The project follows a **Feature-based MVVM (Model-View-ViewModel)** architectural pattern using **Provider** for state management. This ensures a clean separation of concerns and scalability.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# deep_focus
+- **Model**: Data entities and business logic.
+- **View**: UI components and screens.
+- **ViewModel (Provider)**: Logic for managing state and reacting to user interactions.
+
+## 📂 Project Structure
+
+```text
+lib/
+├── core/               # Shared logic and styling
+│   ├── constant/       # App constants (colors, strings)
+│   ├── services/       # External services (audio, storage)
+│   ├── theme/          # App theme data
+│   └── widgets/        # Common UI components
+├── features/           # Feature-based MVVM modules
+│   ├── focus/          # Timer and focus logic
+│   │   ├── model/      # Focus-related data
+│   │   ├── view/       # Focus screen
+│   │   ├── viewmodel/  # Timer provider
+│   │   └── widget/     # Focus-specific widgets
+│   ├── settings/       # User preferences
+│   │   ├── view/       # Settings screen
+│   │   ├── viewmodel/  # Settings provider
+│   │   └── widget/
+│   └── sounds/         # Ambient sound library
+│       ├── model/      # Sound entities
+│       ├── view/       # Sounds screen
+│       ├── viewmodel/  # Audio provider
+│       └── widget/
+├── main.dart           # App entry point
+├── navigation.dart     # Routing logic
+└── providers.dart      # Global provider registration
+```
+
+## 🛠 Tech Stack
+
+- **Flutter**: Cross-platform framework.
+- **Provider**: State management.
+- **Just Audio**: High-performance audio playback.
+- **Google Fonts**: Custom typography.
+
+## 🏁 Getting Started
+
+1. Clone the repository.
+2. Run `flutter pub get` to install dependencies.
+3. Use `flutter run` to launch the app on your preferred device.
