@@ -1,8 +1,8 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
 import 'package:deep_focus/features/sounds/model/sound_model.dart';
-import 'package:deep_focus/features/sounds/presentation/widgets/minit_player.dart';
-import 'package:deep_focus/features/sounds/presentation/widgets/sound_title.dart';
-import 'package:deep_focus/features/sounds/providers/audio_provider.dart';
+import 'package:deep_focus/features/sounds/view/widgets/minit_player.dart';
+import 'package:deep_focus/features/sounds/view/widgets/sound_title.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +30,10 @@ class SoundsScreen extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
-                        horizontalPadding, 20, horizontalPadding, 0,
+                        horizontalPadding,
+                        20,
+                        horizontalPadding,
+                        0,
                       ),
                       child: _buildHeader(context),
                     ),
@@ -40,7 +43,10 @@ class SoundsScreen extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
-                        horizontalPadding, 16, horizontalPadding, 0,
+                        horizontalPadding,
+                        16,
+                        horizontalPadding,
+                        0,
                       ),
                       child: const _SelectedForFocusBanner(),
                     ),
@@ -50,7 +56,10 @@ class SoundsScreen extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
-                        horizontalPadding, 24, horizontalPadding, 10,
+                        horizontalPadding,
+                        24,
+                        horizontalPadding,
+                        10,
                       ),
                       child: _buildSectionHeader(context),
                     ),
@@ -58,8 +67,9 @@ class SoundsScreen extends StatelessWidget {
 
                   // ── Sound list ────────────────────────────────────
                   SliverPadding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                    ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) =>
@@ -178,9 +188,7 @@ class _SelectedForFocusBanner extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.2),
-            ),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [

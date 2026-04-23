@@ -1,6 +1,6 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
 import 'package:deep_focus/features/sounds/model/sound_model.dart';
-import 'package:deep_focus/features/sounds/providers/audio_provider.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -117,7 +117,9 @@ class SoundTile extends StatelessWidget {
                                 vertical: 3.h,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.12),
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.12,
+                                ),
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
                               child: Text(

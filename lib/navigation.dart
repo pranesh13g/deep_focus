@@ -1,7 +1,7 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
-import 'package:deep_focus/features/Focus/presentation/screens/presentation_screen.dart';
-import 'package:deep_focus/features/settings/presentation/screens/settings_screen.dart';
-import 'package:deep_focus/features/sounds/presentation/screens/sounds_screen.dart';
+import 'package:deep_focus/features/Focus/views/presentation_screen.dart';
+import 'package:deep_focus/features/settings/view/settings_screen.dart';
+import 'package:deep_focus/features/sounds/view/sounds_screen.dart';
 import 'package:flutter/material.dart';
 
 class Navigation extends StatefulWidget {
