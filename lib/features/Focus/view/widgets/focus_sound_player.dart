@@ -14,8 +14,8 @@ class FocusSoundPlayer extends StatelessWidget {
     return Consumer<AudioProvider>(
       builder: (context, audio, _) {
         final sound = audio.selectedForFocus;
-        final isPlaying = audio.isPlaying &&
-            (audio.currentSound?.id == sound?.id);
+        final isPlaying =
+            audio.isPlaying && (audio.currentSound?.id == sound?.id);
 
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),

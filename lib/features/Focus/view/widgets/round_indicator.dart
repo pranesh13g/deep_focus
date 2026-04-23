@@ -9,20 +9,16 @@ class RoundIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final round =
-        context.select<TimerProvider, int>((p) => p.currentRound);
-    final total =
-        context.select<TimerProvider, int>((p) => p.totalRounds);
-    final phaseLabel =
-        context.select<TimerProvider, String>((p) => p.phaseLabel);
-    final phase =
-        context.select<TimerProvider, TimerPhase>((p) => p.phase);
+    final timerProvider = context.watch<TimerProvider>();
+    final round = timerProvider.currentRound;
+    final total = timerProvider.totalRounds;
+    final phaseLabel = timerProvider.phaseLabel;
+    final phase = timerProvider.phase;
 
-    // Pick accent color per phase
     final Color phaseColor = switch (phase) {
       TimerPhase.work => AppColors.primary,
-      TimerPhase.shortBreak => const Color(0xFF66BB6A),
-      TimerPhase.longBreak => const Color(0xFF5C6BC0),
+      TimerPhase.shortBreak => AppColors.lightGreen,
+      TimerPhase.longBreak => AppColors.lightindigo,
     };
 
     return Column(

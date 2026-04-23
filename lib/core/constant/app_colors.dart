@@ -11,4 +11,6 @@ class AppColors {
 
   static const lightBlue = Color(0xFFDFF4FF);
   static const lightGray = Color(0xFFF1F1ED);
+  static const lightGreen = Color(0xFF66BB6A);
+  static const lightindigo = Color(0xFF5C6BC0);
 }

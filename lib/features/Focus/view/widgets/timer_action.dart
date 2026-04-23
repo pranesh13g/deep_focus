@@ -10,8 +10,8 @@ class TimerAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRunning =
-        context.select<TimerProvider, bool>((p) => p.isRunning);
+    final timerProvider = context.watch<TimerProvider>();
+    final isRunning = timerProvider.isRunning;
 
     return Column(
       children: [

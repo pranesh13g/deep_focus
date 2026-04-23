@@ -9,8 +9,9 @@ class TimerDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final minutes = context.select<TimerProvider, String>((p) => p.minutesPart);
-    final seconds = context.select<TimerProvider, String>((p) => p.secondsPart);
+    final timerProvider = context.watch<TimerProvider>();
+    final minutes = timerProvider.minutesPart;
+    final seconds = timerProvider.secondsPart;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

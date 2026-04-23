@@ -13,7 +13,6 @@ class TimerProvider extends ChangeNotifier {
   bool _isRunning = false;
   Timer? _timer;
 
-  // Callback invoked when timer resumes (so audio can auto-start)
   VoidCallback? onResume;
 
   TimerProvider(this._settings) {
@@ -37,7 +36,6 @@ class TimerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Getters ────────────────────────────────────────────────────────────────
   int get currentRound => _currentRound;
   int get totalRounds => _settings.totalRounds;
   int get remainingSeconds => _remainingSeconds;
