@@ -1,4 +1,5 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
+import 'package:deep_focus/features/about/view/about_screen.dart';
 import 'package:deep_focus/features/focus/view/presentation_screen.dart';
 import 'package:deep_focus/features/settings/view/settings_screen.dart';
 
@@ -21,6 +22,7 @@ class _NavigationState extends State<Navigation> {
     const PresentationScreen(),
     const SoundsScreen(),
     const SettingsScreen(),
+    const AboutScreen(),
   ];
 
   void onItemTapped(int index) {
@@ -50,6 +52,7 @@ class _NavigationState extends State<Navigation> {
             icon: Icon(Icons.settings),
             label: "SETTINGS",
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.info), label: "ABOUT"),
         ],
       ),
     );
