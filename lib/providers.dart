@@ -1,6 +1,7 @@
-import 'package:deep_focus/features/Focus/viewmodels/timer_provider.dart';
-import 'package:deep_focus/features/settings/viewmodels/settings_provider.dart';
-import 'package:deep_focus/features/sounds/viewmodels/audio_provider.dart';
+import 'package:deep_focus/features/focus/viewmodel/timer_provider.dart';
+import 'package:deep_focus/features/settings/viewmodel/settings_provider.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
+
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 

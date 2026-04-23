@@ -1,6 +1,7 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
-import 'package:deep_focus/features/sounds/models/sound_model.dart';
-import 'package:deep_focus/features/sounds/viewmodels/audio_provider.dart';
+import 'package:deep_focus/features/sounds/model/sound_model.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';

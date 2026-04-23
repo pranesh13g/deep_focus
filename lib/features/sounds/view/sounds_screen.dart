@@ -1,8 +1,8 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
-import 'package:deep_focus/features/sounds/models/sound_model.dart';
-import 'package:deep_focus/features/sounds/widgets/minit_player.dart';
-import 'package:deep_focus/features/sounds/widgets/sound_title.dart';
-import 'package:deep_focus/features/sounds/viewmodels/audio_provider.dart';
+import 'package:deep_focus/features/sounds/model/sound_model.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
+import 'package:deep_focus/features/sounds/widget/minit_player.dart';
+import 'package:deep_focus/features/sounds/widget/sound_title.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';

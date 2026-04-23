@@ -1,8 +1,8 @@
 import 'package:deep_focus/core/widgets/app_bar.dart';
-import 'package:deep_focus/features/Focus/widgets/round_indicator.dart';
-import 'package:deep_focus/features/Focus/widgets/focus_sound_player.dart';
-import 'package:deep_focus/features/Focus/widgets/time_display.dart';
-import 'package:deep_focus/features/Focus/widgets/timer_action.dart';
+import 'package:deep_focus/features/focus/widget/round_indicator.dart';
+import 'package:deep_focus/features/focus/widget/focus_sound_player.dart';
+import 'package:deep_focus/features/focus/widget/time_display.dart';
+import 'package:deep_focus/features/focus/widget/timer_action.dart';
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:deep_focus/core/constant/app_colors.dart';
