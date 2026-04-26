@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService.init();
+  NotificationService.init(); // Non-blocking init
   runApp(
     MultiProvider(providers: AppProviders.allProviders, child: const MyApp()),
   );

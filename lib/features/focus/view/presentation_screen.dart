@@ -40,7 +40,7 @@ class _DeepWorkSessionView extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
-              AppBar(),
+              const AppBar(),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(

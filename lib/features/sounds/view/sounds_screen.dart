@@ -138,7 +138,7 @@ class SoundsScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 6),
               Text(
-                'White Noise Library',
+                'Sound Library',
                 style: GoogleFonts.inter(
                   fontSize: 30,
                   fontWeight: FontWeight.w700,
