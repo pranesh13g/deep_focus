@@ -49,7 +49,7 @@ class SettingsScreen extends StatelessWidget {
 
                   // Subtitle
                   Text(
-                    'Customize your focus flow to match your natural cognitive cycles. Soft transitions for deep immersion.',
+                    'Customize your Deep Focus to match your natural cognitive cycles. Soft transitions for deep immersion.',
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w400,

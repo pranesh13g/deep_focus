@@ -28,7 +28,7 @@ class PhilosophyCard extends StatelessWidget {
           ),
           SizedBox(height: 12.h),
           Text(
-            'In an age of constant noise, Focus-Flow was born from a simple realization: the most profound work happens in the quiet gaps between notifications. We design environments that don\'t just track your time, but protect your peace.',
+            'In an age of constant noise, Deep Focus was born from a simple realization: the most profound work happens in the quiet gaps between notifications. We design environments that don\'t just track your time, but protect your peace.',
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w400,

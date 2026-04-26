@@ -17,7 +17,7 @@ class AppBar extends StatelessWidget {
               Icon(Icons.spa_outlined, color: AppColors.primary, size: 22.sp),
               SizedBox(width: 8.w),
               Text(
-                'Focus Flow',
+                'Deep Focus',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontStyle: FontStyle.italic,

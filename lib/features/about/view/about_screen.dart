@@ -29,7 +29,7 @@ class AboutScreen extends StatelessWidget {
               const AboutSubSection(
                 title: 'Intentionality',
                 content:
-                    'Every interaction in Focus-Flow is designed to minimize cognitive load. We believe in soft edges, neutral tones, and the power of white space.',
+                    'Every interaction in Deep Focus is designed to minimize cognitive load. We believe in soft edges, neutral tones, and the power of white space.',
               ),
               SizedBox(height: 32.h),
               const AboutSubSection(
