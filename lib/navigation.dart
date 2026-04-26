@@ -4,7 +4,9 @@ import 'package:deep_focus/features/focus/view/presentation_screen.dart';
 import 'package:deep_focus/features/settings/view/settings_screen.dart';
 
 import 'package:deep_focus/features/sounds/view/sounds_screen.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Navigation extends StatefulWidget {
   final int? pageNum;
@@ -26,6 +28,10 @@ class _NavigationState extends State<Navigation> {
   ];
 
   void onItemTapped(int index) {
+    if (index != selectedIndex) {
+      // STOP MUSIC when switching pages
+      context.read<AudioProvider>().pauseAudio();
+    }
     setState(() {
       selectedIndex = index;
     });

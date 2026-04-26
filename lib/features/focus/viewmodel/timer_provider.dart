@@ -27,8 +27,17 @@ class TimerProvider extends ChangeNotifier {
     _audio = audio;
 
     // Only update remaining seconds if settings actually changed and timer isn't running
-    if (!_isRunning && (oldSettings == null || _hasDurationsChanged(oldSettings, settings))) {
-      _remainingSeconds = _getInitialSeconds(settings, _phase);
+    if (!_isRunning) {
+      if (oldSettings == null || _hasDurationsChanged(oldSettings, settings)) {
+        _remainingSeconds = _getInitialSeconds(settings, _phase);
+      }
+    }
+
+    // INTERLINKING RULE: Ensure audio state matches session state when Focus screen is built.
+    if (_isRunning) {
+      _syncAudio();
+    } else {
+      _audio?.pauseAudio();
     }
     notifyListeners();
   }
@@ -46,8 +55,8 @@ class TimerProvider extends ChangeNotifier {
 
   bool _hasDurationsChanged(SettingsProvider old, SettingsProvider current) {
     return old.workDurationSeconds != current.workDurationSeconds ||
-           old.shortBreakSeconds != current.shortBreakSeconds ||
-           old.longBreakSeconds != current.longBreakSeconds;
+        old.shortBreakSeconds != current.shortBreakSeconds ||
+        old.longBreakSeconds != current.longBreakSeconds;
   }
 
   int get currentRound => _currentRound;
@@ -164,8 +173,10 @@ class TimerProvider extends ChangeNotifier {
     if (oldPhase == TimerPhase.work) {
       final isLong = _phase == TimerPhase.longBreak;
       _triggerNotification(
-        isLong ? 'Full Break Started' : 'Quick Break Started',
-        isLong ? 'Take a good rest. You earned it!' : 'Stretch a bit and relax.',
+        isLong ? '😴 Full Break Started' : '⏱ Quick Break Started',
+        isLong
+            ? 'Take a good rest. You earned it!'
+            : 'Stretch a bit and relax.',
       );
     }
 

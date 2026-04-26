@@ -18,21 +18,46 @@ class FocusSoundPlayer extends StatefulWidget {
 
 class _FocusSoundPlayerState extends State<FocusSoundPlayer> {
   late PageController _pageController;
+  late AudioProvider _audioProvider;
 
   @override
   void initState() {
     super.initState();
-    final audioProvider = context.read<AudioProvider>();
+    _audioProvider = context.read<AudioProvider>();
     final initialIndex = allSounds.indexWhere(
-      (s) => s.id == audioProvider.selectedForFocus?.id,
+      (s) => s.id == _audioProvider.selectedForFocus?.id,
     );
     _pageController = PageController(
       initialPage: initialIndex != -1 ? initialIndex : 0,
     );
+
+    // Listen for external changes (like from MiniPlayer)
+    _audioProvider.addListener(_syncPageController);
+  }
+
+  void _syncPageController() {
+    if (!mounted) return;
+    final selectedId = _audioProvider.selectedForFocus?.id;
+    if (selectedId == null) return;
+
+    final currentIndex =
+        _pageController.hasClients ? _pageController.page?.round() : -1;
+    final targetIndex = allSounds.indexWhere((s) => s.id == selectedId);
+
+    if (targetIndex != -1 && targetIndex != currentIndex) {
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          targetIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    }
   }
 
   @override
   void dispose() {
+    _audioProvider.removeListener(_syncPageController);
     _pageController.dispose();
     super.dispose();
   }

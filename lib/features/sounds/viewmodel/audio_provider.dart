@@ -111,7 +111,9 @@ class AudioProvider extends ChangeNotifier {
     final index = allSounds.indexWhere((s) => s.id == _currentSound!.id);
     if (index != -1) {
       final nextIndex = (index + 1) % allSounds.length;
-      await play(allSounds[nextIndex]);
+      final nextSound = allSounds[nextIndex];
+      _selectedForFocus = nextSound; // Select also
+      await play(nextSound);
     }
   }
 
@@ -120,7 +122,9 @@ class AudioProvider extends ChangeNotifier {
     final index = allSounds.indexWhere((s) => s.id == _currentSound!.id);
     if (index != -1) {
       final prevIndex = (index - 1 + allSounds.length) % allSounds.length;
-      await play(allSounds[prevIndex]);
+      final prevSound = allSounds[prevIndex];
+      _selectedForFocus = prevSound; // Select also
+      await play(prevSound);
     }
   }
 
