@@ -1,22 +1,14 @@
 import 'package:deep_focus/core/theme/app_theme.dart';
 import 'package:deep_focus/navigation.dart';
 import 'package:deep_focus/providers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:device_preview/device_preview.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) => MultiProvider(
-        providers: AppProviders.allProviders,
-        child: const MyApp(),
-      ),
-    ),
+    MultiProvider(providers: AppProviders.allProviders, child: const MyApp()),
   );
 }
 
@@ -31,8 +23,6 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (_, child) {
         return MaterialApp(
-          locale: DevicePreview.locale(context),
-          builder: DevicePreview.appBuilder,
           debugShowCheckedModeBanner: false,
           title: 'Deep Focus',
           theme: AppTheme.lightTheme,

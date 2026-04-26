@@ -61,7 +61,7 @@ class AudioProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _player.setUrl(sound.assetPath);
+      await _player.setAsset(sound.assetPath);
       await _player.setLoopMode(LoopMode.one);
       await _player.play();
     } catch (e) {
@@ -88,7 +88,7 @@ class AudioProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _player.setUrl(sound.assetPath);
+      await _player.setAsset(sound.assetPath);
       await _player.setLoopMode(LoopMode.one);
       await _player.play();
     } catch (e) {

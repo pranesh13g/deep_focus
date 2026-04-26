@@ -79,6 +79,41 @@ class SoundsScreen extends StatelessWidget {
                     ),
                   ),
 
+                  // ── Nature Sounds Section header ──────────────────
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        32,
+                        horizontalPadding,
+                        10,
+                      ),
+                      child: const Text(
+                        'Nature Sounds',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // ── Nature Sound list ─────────────────────────────
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) =>
+                            SoundTile(sound: natureSounds[index]),
+                        childCount: natureSounds.length,
+                      ),
+                    ),
+                  ),
+
                   // Bottom padding for mini player
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
