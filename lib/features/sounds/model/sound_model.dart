@@ -68,3 +68,8 @@ final List<SoundModel> natureSounds = [
     iconPath: 'thunder',
   ),
 ];
+
+final List<SoundModel> allSounds = [
+  ...essentialTones,
+  ...natureSounds,
+];
