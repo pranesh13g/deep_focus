@@ -49,6 +49,7 @@ lib/
 ## 🛠 Tech Stack
 
 - **Flutter**: Cross-platform framework.
+- **Dart**: 3.11.4
 - **Provider**: State management.
 - **Just Audio**: High-performance audio playback.
 - **Google Fonts**: Custom typography.
