@@ -6,39 +6,42 @@ import 'package:flutter/material.dart';
 enum TimerPhase { work, shortBreak, longBreak }
 
 class TimerProvider extends ChangeNotifier {
-  SettingsProvider _settings;
+  SettingsProvider? _settings;
 
   int _currentRound = 1;
   TimerPhase _phase = TimerPhase.work;
-  int _remainingSeconds = 0;
+  int _remainingSeconds = 1500; // Default 25 mins
   bool _isRunning = false;
   Timer? _timer;
 
-  VoidCallback? onResume;
+  TimerProvider();
 
-  TimerProvider(this._settings) {
-    _remainingSeconds = _settings.workDurationSeconds;
-  }
-
-  // Called by ProxyProvider when SettingsProvider changes
-  void update(SettingsProvider settings) {
+  /// Syncs settings from the UI layer.
+  void syncSettings(SettingsProvider settings) {
+    final oldSettings = _settings;
     _settings = settings;
 
-    // If we're in work phase and not running, update the display time
-    if (!_isRunning) {
+    // Only update remaining seconds if settings actually changed and timer isn't running
+    if (!_isRunning && (oldSettings == null || _hasDurationsChanged(oldSettings, settings))) {
       if (_phase == TimerPhase.work) {
-        _remainingSeconds = _settings.workDurationSeconds;
+        _remainingSeconds = settings.workDurationSeconds;
       } else if (_phase == TimerPhase.shortBreak) {
-        _remainingSeconds = _settings.shortBreakSeconds;
+        _remainingSeconds = settings.shortBreakSeconds;
       } else {
-        _remainingSeconds = _settings.longBreakSeconds;
+        _remainingSeconds = settings.longBreakSeconds;
       }
     }
     notifyListeners();
   }
 
+  bool _hasDurationsChanged(SettingsProvider old, SettingsProvider current) {
+    return old.workDurationSeconds != current.workDurationSeconds ||
+           old.shortBreakSeconds != current.shortBreakSeconds ||
+           old.longBreakSeconds != current.longBreakSeconds;
+  }
+
   int get currentRound => _currentRound;
-  int get totalRounds => _settings.totalRounds;
+  int get totalRounds => _settings?.totalRounds ?? 4;
   int get remainingSeconds => _remainingSeconds;
   bool get isRunning => _isRunning;
   TimerPhase get phase => _phase;
@@ -68,7 +71,6 @@ class TimerProvider extends ChangeNotifier {
     _isRunning = !_isRunning;
     if (_isRunning) {
       _startTimer();
-      onResume?.call(); // auto-play audio
     } else {
       _timer?.cancel();
     }
@@ -81,7 +83,7 @@ class TimerProvider extends ChangeNotifier {
     _isRunning = false;
     _currentRound = 1;
     _phase = TimerPhase.work;
-    _remainingSeconds = _settings.workDurationSeconds;
+    _remainingSeconds = _settings?.workDurationSeconds ?? 1500;
     notifyListeners();
   }
 
@@ -106,32 +108,35 @@ class TimerProvider extends ChangeNotifier {
   }
 
   void _advancePhase() {
+    final settings = _settings;
+    if (settings == null) return;
+
     switch (_phase) {
       case TimerPhase.work:
         // Move to break
-        final isLongBreak = _currentRound % _settings.totalRounds == 0;
+        final isLongBreak = _currentRound % settings.totalRounds == 0;
         _phase = isLongBreak ? TimerPhase.longBreak : TimerPhase.shortBreak;
         _remainingSeconds = isLongBreak
-            ? _settings.longBreakSeconds
-            : _settings.shortBreakSeconds;
+            ? settings.longBreakSeconds
+            : settings.shortBreakSeconds;
         break;
 
       case TimerPhase.shortBreak:
       case TimerPhase.longBreak:
         // Move to next work round
-        if (_currentRound < _settings.totalRounds) {
+        if (_currentRound < settings.totalRounds) {
           _currentRound++;
         } else {
           // All rounds done – reset to start, stay paused
           _currentRound = 1;
           _isRunning = false;
           _phase = TimerPhase.work;
-          _remainingSeconds = _settings.workDurationSeconds;
+          _remainingSeconds = settings.workDurationSeconds;
           notifyListeners();
           return;
         }
         _phase = TimerPhase.work;
-        _remainingSeconds = _settings.workDurationSeconds;
+        _remainingSeconds = settings.workDurationSeconds;
         break;
     }
 

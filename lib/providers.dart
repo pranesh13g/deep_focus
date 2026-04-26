@@ -11,16 +11,6 @@ class AppProviders {
     ChangeNotifierProvider(create: (_) => SettingsProvider()),
     ChangeNotifierProvider(create: (_) => AudioProvider()),
     ChangeNotifierProvider(create: (_) => AboutProvider()),
-    ChangeNotifierProxyProvider<SettingsProvider, TimerProvider>(
-      create: (ctx) =>
-          TimerProvider(ctx.read<SettingsProvider>())
-            ..onResume = () => ctx.read<AudioProvider>().playSelected(),
-      update: (ctx, settings, previous) {
-        final provider = previous ?? TimerProvider(settings);
-        provider.update(settings);
-        provider.onResume = () => ctx.read<AudioProvider>().playSelected();
-        return provider;
-      },
-    ),
+    ChangeNotifierProvider(create: (_) => TimerProvider()),
   ];
 }

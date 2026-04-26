@@ -73,3 +73,11 @@ final List<SoundModel> allSounds = [
   ...essentialTones,
   ...natureSounds,
 ];
+
+const clockTickingSound = SoundModel(
+  id: 'clock_ticking',
+  title: 'Clock Ticking',
+  subtitle: 'Break time rhythm',
+  assetPath: 'assets/audio/clock_ticking.mp3',
+  iconPath: 'clock',
+);

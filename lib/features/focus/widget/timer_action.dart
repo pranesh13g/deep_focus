@@ -1,5 +1,6 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
 import 'package:deep_focus/features/focus/viewmodel/timer_provider.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,7 +21,9 @@ class TimerAction extends StatelessWidget {
           width: double.infinity,
           height: 64.h,
           child: ElevatedButton(
-            onPressed: () => context.read<TimerProvider>().togglePause(),
+            onPressed: () {
+              context.read<TimerProvider>().togglePause();
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,

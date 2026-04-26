@@ -45,12 +45,10 @@ class AudioProvider extends ChangeNotifier {
     });
   }
 
-  /// Play/toggle a sound from the Sounds library list.
+  /// Play a sound from the Sounds library list.
   Future<void> play(SoundModel sound) async {
     if (_currentSound?.id == sound.id) {
-      if (_isPlaying) {
-        await _player.pause();
-      } else {
+      if (!_isPlaying) {
         await _player.play();
       }
       return;
@@ -70,6 +68,15 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
+  /// Toggle a sound (play if different or paused, pause if same and playing)
+  Future<void> togglePlay(SoundModel sound) async {
+    if (_currentSound?.id == sound.id) {
+      await togglePlayPause();
+    } else {
+      await play(sound);
+    }
+  }
+
   /// Select a sound to use on the Focus screen (does NOT auto-play).
   void selectForFocus(SoundModel sound) {
     _selectedForFocus = sound;
@@ -80,21 +87,11 @@ class AudioProvider extends ChangeNotifier {
   Future<void> playSelected() async {
     final sound = _selectedForFocus;
     if (sound == null) return;
-    if (_currentSound?.id == sound.id) {
-      if (!_isPlaying) await _player.play();
-      return;
-    }
-    _currentSound = sound;
-    _isLoading = true;
-    notifyListeners();
-    try {
-      await _player.setAsset(sound.assetPath);
-      await _player.setLoopMode(LoopMode.one);
-      await _player.play();
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-    }
+    await play(sound);
+  }
+
+  Future<void> playBreakSound() async {
+    await play(clockTickingSound);
   }
 
   Future<void> togglePlayPause() async {

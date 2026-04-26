@@ -61,7 +61,7 @@ class SoundTile extends StatelessWidget {
           onTap: () {
             // Mark as selected for Focus AND play in the library
             audioProvider.selectForFocus(sound);
-            audioProvider.play(sound);
+            audioProvider.togglePlay(sound);
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),
@@ -155,7 +155,7 @@ class SoundTile extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     audioProvider.selectForFocus(sound);
-                    audioProvider.play(sound);
+                    audioProvider.togglePlay(sound);
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
