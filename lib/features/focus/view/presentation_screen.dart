@@ -21,16 +21,8 @@ class PresentationScreen extends StatelessWidget {
   }
 }
 
-class _DeepWorkSessionView extends StatefulWidget {
+class _DeepWorkSessionView extends StatelessWidget {
   const _DeepWorkSessionView();
-
-  @override
-  State<_DeepWorkSessionView> createState() => _DeepWorkSessionViewState();
-}
-
-class _DeepWorkSessionViewState extends State<_DeepWorkSessionView> {
-  TimerPhase? _lastPhase;
-  bool? _lastRunning;
 
   @override
   Widget build(BuildContext context) {
@@ -38,25 +30,8 @@ class _DeepWorkSessionViewState extends State<_DeepWorkSessionView> {
     final timer = context.watch<TimerProvider>();
     final audio = context.read<AudioProvider>();
 
-    // Sync settings
-    timer.syncSettings(settings);
-
-    // Sync Audio with Timer state/phase changes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_lastPhase != timer.phase || _lastRunning != timer.isRunning) {
-        if (timer.isRunning) {
-          if (timer.phase == TimerPhase.work) {
-            audio.playSelected();
-          } else {
-            audio.playBreakSound();
-          }
-        } else {
-          audio.pauseAudio();
-        }
-        _lastPhase = timer.phase;
-        _lastRunning = timer.isRunning;
-      }
-    });
+    // Inject dependencies (View acting as Coordinator)
+    timer.setDependencies(settings, audio);
 
     return Scaffold(
       backgroundColor: AppColors.neutral,

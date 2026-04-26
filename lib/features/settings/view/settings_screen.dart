@@ -84,7 +84,7 @@ class SettingsScreen extends StatelessWidget {
 
                   // Work Duration
                   SliderRow(
-                    label: 'Work Duration',
+                    label: 'Productivity Time',
                     value: settings.workDuration,
                     min: 5,
                     max: 90,
@@ -99,7 +99,7 @@ class SettingsScreen extends StatelessWidget {
                   SizedBox(height: 28.h),
 
                   SliderRow(
-                    label: 'Short Break',
+                    label: 'Quick Break',
                     value: settings.shortBreak,
                     min: 1,
                     max: 30,
@@ -110,7 +110,7 @@ class SettingsScreen extends StatelessWidget {
                   SizedBox(height: 28.h),
 
                   SliderRow(
-                    label: 'Long Break',
+                    label: 'Full Break',
                     value: settings.longBreak,
                     min: 5,
                     max: 60,
@@ -121,7 +121,7 @@ class SettingsScreen extends StatelessWidget {
                   SizedBox(height: 28.h),
 
                   SliderRow(
-                    label: 'Session Rounds',
+                    label: 'Focus Cycles',
                     value: settings.sessionRounds,
                     min: 1,
                     max: 10,

@@ -106,6 +106,24 @@ class AudioProvider extends ChangeNotifier {
     await _player.pause();
   }
 
+  Future<void> playNext() async {
+    if (_currentSound == null) return;
+    final index = allSounds.indexWhere((s) => s.id == _currentSound!.id);
+    if (index != -1) {
+      final nextIndex = (index + 1) % allSounds.length;
+      await play(allSounds[nextIndex]);
+    }
+  }
+
+  Future<void> playPrevious() async {
+    if (_currentSound == null) return;
+    final index = allSounds.indexWhere((s) => s.id == _currentSound!.id);
+    if (index != -1) {
+      final prevIndex = (index - 1 + allSounds.length) % allSounds.length;
+      await play(allSounds[prevIndex]);
+    }
+  }
+
   Future<void> seekForward() async {
     final newPos = _position + const Duration(seconds: 10);
     await _player.seek(newPos < _duration ? newPos : _duration);

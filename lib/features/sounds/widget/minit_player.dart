@@ -112,7 +112,7 @@ class MiniPlayer extends StatelessWidget {
                       children: [
                         _controlBtn(
                           icon: Icons.skip_previous_rounded,
-                          onTap: audio.seekBackward,
+                          onTap: audio.playPrevious,
                         ),
                         const SizedBox(width: 4),
                         GestureDetector(
@@ -144,7 +144,7 @@ class MiniPlayer extends StatelessWidget {
                         const SizedBox(width: 4),
                         _controlBtn(
                           icon: Icons.skip_next_rounded,
-                          onTap: audio.seekForward,
+                          onTap: audio.playNext,
                         ),
                       ],
                     ),

@@ -39,6 +39,7 @@ dependencies:
   google_fonts: ^8.0.2
   just_audio: ^0.10.5
   url_launcher: ^6.3.0
+  flutter_local_notifications: ^21.0.0
 
 dev_dependencies:
   flutter_test:

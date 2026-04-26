@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:deep_focus/core/services/notification_service.dart';
 import 'package:deep_focus/features/settings/viewmodel/settings_provider.dart';
+import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 enum TimerPhase { work, shortBreak, longBreak }
 
 class TimerProvider extends ChangeNotifier {
   SettingsProvider? _settings;
+  AudioProvider? _audio;
 
   int _currentRound = 1;
   TimerPhase _phase = TimerPhase.work;
@@ -16,22 +20,28 @@ class TimerProvider extends ChangeNotifier {
 
   TimerProvider();
 
-  /// Syncs settings from the UI layer.
-  void syncSettings(SettingsProvider settings) {
+  /// Syncs settings and audio provider from the UI layer.
+  void setDependencies(SettingsProvider settings, AudioProvider audio) {
     final oldSettings = _settings;
     _settings = settings;
+    _audio = audio;
 
     // Only update remaining seconds if settings actually changed and timer isn't running
     if (!_isRunning && (oldSettings == null || _hasDurationsChanged(oldSettings, settings))) {
-      if (_phase == TimerPhase.work) {
-        _remainingSeconds = settings.workDurationSeconds;
-      } else if (_phase == TimerPhase.shortBreak) {
-        _remainingSeconds = settings.shortBreakSeconds;
-      } else {
-        _remainingSeconds = settings.longBreakSeconds;
-      }
+      _remainingSeconds = _getInitialSeconds(settings, _phase);
     }
     notifyListeners();
+  }
+
+  int _getInitialSeconds(SettingsProvider settings, TimerPhase phase) {
+    switch (phase) {
+      case TimerPhase.work:
+        return settings.workDurationSeconds;
+      case TimerPhase.shortBreak:
+        return settings.shortBreakSeconds;
+      case TimerPhase.longBreak:
+        return settings.longBreakSeconds;
+    }
   }
 
   bool _hasDurationsChanged(SettingsProvider old, SettingsProvider current) {
@@ -58,11 +68,11 @@ class TimerProvider extends ChangeNotifier {
   String get phaseLabel {
     switch (_phase) {
       case TimerPhase.work:
-        return 'DEEP WORK SESSION';
+        return 'PRODUCTIVITY SESSION';
       case TimerPhase.shortBreak:
-        return 'SHORT BREAK';
+        return 'QUICK BREAK';
       case TimerPhase.longBreak:
-        return 'LONG BREAK';
+        return 'FULL BREAK';
     }
   }
 
@@ -71,10 +81,20 @@ class TimerProvider extends ChangeNotifier {
     _isRunning = !_isRunning;
     if (_isRunning) {
       _startTimer();
+      _syncAudio();
     } else {
       _timer?.cancel();
+      _audio?.pauseAudio();
     }
     notifyListeners();
+  }
+
+  void _syncAudio() {
+    if (_phase == TimerPhase.work) {
+      _audio?.playSelected();
+    } else {
+      _audio?.playBreakSound();
+    }
   }
 
   /// Reset: stop timer, go back to round 1 work phase, stay paused.
@@ -84,6 +104,7 @@ class TimerProvider extends ChangeNotifier {
     _currentRound = 1;
     _phase = TimerPhase.work;
     _remainingSeconds = _settings?.workDurationSeconds ?? 1500;
+    _audio?.pauseAudio();
     notifyListeners();
   }
 
@@ -111,9 +132,10 @@ class TimerProvider extends ChangeNotifier {
     final settings = _settings;
     if (settings == null) return;
 
+    final oldPhase = _phase;
+
     switch (_phase) {
       case TimerPhase.work:
-        // Move to break
         final isLongBreak = _currentRound % settings.totalRounds == 0;
         _phase = isLongBreak ? TimerPhase.longBreak : TimerPhase.shortBreak;
         _remainingSeconds = isLongBreak
@@ -123,15 +145,14 @@ class TimerProvider extends ChangeNotifier {
 
       case TimerPhase.shortBreak:
       case TimerPhase.longBreak:
-        // Move to next work round
         if (_currentRound < settings.totalRounds) {
           _currentRound++;
         } else {
-          // All rounds done – reset to start, stay paused
           _currentRound = 1;
           _isRunning = false;
           _phase = TimerPhase.work;
           _remainingSeconds = settings.workDurationSeconds;
+          _audio?.pauseAudio();
           notifyListeners();
           return;
         }
@@ -140,10 +161,28 @@ class TimerProvider extends ChangeNotifier {
         break;
     }
 
+    if (oldPhase == TimerPhase.work) {
+      final isLong = _phase == TimerPhase.longBreak;
+      _triggerNotification(
+        isLong ? 'Full Break Started' : 'Quick Break Started',
+        isLong ? 'Take a good rest. You earned it!' : 'Stretch a bit and relax.',
+      );
+    }
+
     if (_isRunning) {
       _startTimer();
+      _syncAudio();
     }
     notifyListeners();
+  }
+
+  void _triggerNotification(String title, String body) {
+    HapticFeedback.vibrate(); // Immediate vibration
+    NotificationService.showNotification(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: title,
+      body: body,
+    );
   }
 
   @override
