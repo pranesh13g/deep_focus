@@ -7,7 +7,7 @@ class NotificationService {
 
   static Future<void> init() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('notification_icon');
 
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
@@ -59,6 +59,7 @@ class NotificationService {
           enableVibration: true,
           vibrationPattern: vibrationPattern,
           playSound: true,
+          icon: 'notification_icon', // EXPLICITLY set the icon here
         );
 
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =

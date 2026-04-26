@@ -50,7 +50,7 @@ class _NavigationState extends State<Navigation> {
         unselectedItemColor: AppColors.secondary,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.center_focus_strong),
+            icon: const Icon(Icons.track_changes),
             label: "FOCUS",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.waves), label: "SOUNDS"),
