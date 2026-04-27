@@ -3,13 +3,9 @@ import 'package:deep_focus/features/focus/widget/round_indicator.dart';
 import 'package:deep_focus/features/focus/widget/focus_sound_player.dart';
 import 'package:deep_focus/features/focus/widget/time_display.dart';
 import 'package:deep_focus/features/focus/widget/timer_action.dart';
-import 'package:deep_focus/features/focus/viewmodel/timer_provider.dart';
-import 'package:deep_focus/features/settings/viewmodel/settings_provider.dart';
-import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
 import 'package:flutter/material.dart' hide AppBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:deep_focus/core/constant/app_colors.dart';
-import 'package:provider/provider.dart';
 
 class PresentationScreen extends StatelessWidget {
   const PresentationScreen({super.key});
@@ -26,13 +22,7 @@ class _DeepWorkSessionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<SettingsProvider>();
-    final timer = context.watch<TimerProvider>();
-    final audio = context.read<AudioProvider>();
-
-    // Inject dependencies (View acting as Coordinator)
-    timer.setDependencies(settings, audio);
-
+    // Dependencies are now injected via ProxyProvider in providers.dart
     return Scaffold(
       backgroundColor: AppColors.neutral,
       body: SafeArea(

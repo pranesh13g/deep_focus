@@ -5,6 +5,7 @@ import 'package:deep_focus/features/settings/view/settings_screen.dart';
 
 import 'package:deep_focus/features/sounds/view/sounds_screen.dart';
 import 'package:deep_focus/features/sounds/viewmodel/audio_provider.dart';
+import 'package:deep_focus/features/focus/viewmodel/timer_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ class Navigation extends StatefulWidget {
   _NavigationState createState() => _NavigationState();
 }
 
-class _NavigationState extends State<Navigation> {
+class _NavigationState extends State<Navigation> with WidgetsBindingObserver {
   int selectedIndex = 0;
 
   final List<Widget> screens = [
@@ -26,6 +27,27 @@ class _NavigationState extends State<Navigation> {
     const SettingsScreen(),
     const AboutScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // STOP MUSIC and CLOCK only when app is fully backgrounded
+      context.read<AudioProvider>().pauseAudio();
+      context.read<TimerProvider>().pause();
+    }
+  }
 
   void onItemTapped(int index) {
     if (index != selectedIndex) {
@@ -48,9 +70,9 @@ class _NavigationState extends State<Navigation> {
         backgroundColor: AppColors.neutral,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.secondary,
-        items: [
+        items: const [
           BottomNavigationBarItem(
-            icon: const Icon(Icons.track_changes),
+            icon: Icon(Icons.track_changes),
             label: "FOCUS",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.waves), label: "SOUNDS"),

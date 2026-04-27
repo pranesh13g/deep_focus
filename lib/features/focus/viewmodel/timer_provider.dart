@@ -92,9 +92,14 @@ class TimerProvider extends ChangeNotifier {
       _startTimer();
       _syncAudio();
     } else {
-      _timer?.cancel();
-      _audio?.pauseAudio();
+      pause();
     }
+  }
+
+  void pause() {
+    _isRunning = false;
+    _timer?.cancel();
+    _audio?.pauseAudio();
     notifyListeners();
   }
 
