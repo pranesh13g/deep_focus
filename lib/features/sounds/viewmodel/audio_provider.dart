@@ -83,8 +83,22 @@ class AudioProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isFocusSoundEnabled = false;
+  bool get isFocusSoundEnabled => _isFocusSoundEnabled;
+
+  Future<void> toggleFocusSound() async {
+    _isFocusSoundEnabled = !_isFocusSoundEnabled;
+    if (_isFocusSoundEnabled) {
+      await playSelected();
+    } else {
+      await pauseAudio();
+    }
+    notifyListeners();
+  }
+
   /// Called by TimerProvider when user resumes the session.
   Future<void> playSelected() async {
+    if (!_isFocusSoundEnabled) return;
     final sound = _selectedForFocus;
     if (sound == null) return;
     await play(sound);

@@ -164,27 +164,37 @@ class _FocusSoundPlayerState extends State<FocusSoundPlayer> {
 
         SizedBox(width: 12.w),
 
-        // Play/Pause button (Disabled as it's linked to Timer)
-        Container(
-          width: 44.w,
-          height: 44.w,
-          decoration: BoxDecoration(
-            color: AppColors.lightGray,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: isLoading && isPlaying
-              ? Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.primary,
+        // Play/Pause button
+        GestureDetector(
+          onTap: () {
+            final audio = context.read<AudioProvider>();
+            if (sound.id == clockTickingSound.id) {
+              audio.togglePlayPause();
+            } else {
+              audio.toggleFocusSound();
+            }
+          },
+          child: Container(
+            width: 44.w,
+            height: 44.w,
+            decoration: BoxDecoration(
+              color: AppColors.lightGray,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: isLoading && isPlaying
+                ? Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  )
+                : Icon(
+                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    size: 22.sp,
+                    color: AppColors.textPrimary,
                   ),
-                )
-              : Icon(
-                  isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                  size: 22.sp,
-                  color: AppColors.textPrimary.withValues(alpha: 0.3),
-                ),
+          ),
         ),
       ],
     );
