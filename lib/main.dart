@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService.init(); // Non-blocking init
+  await ScreenUtil.ensureScreenSize();
   runApp(
     MultiProvider(providers: AppProviders.allProviders, child: const MyApp()),
   );
