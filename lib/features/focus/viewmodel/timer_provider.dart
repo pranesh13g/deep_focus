@@ -178,7 +178,7 @@ class TimerProvider extends ChangeNotifier {
     if (oldPhase == TimerPhase.work) {
       final isLong = _phase == TimerPhase.longBreak;
       _triggerNotification(
-        isLong ? '😴 Full Break Started' : '⏱ Quick Break Started',
+        isLong ? 'Full Break Started' : ' Quick Break Started',
         isLong
             ? 'Take a good rest. You earned it!'
             : 'Stretch a bit and relax.',
