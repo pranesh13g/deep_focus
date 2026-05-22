@@ -51,23 +51,8 @@
 
 The codebase is engineered with a **Feature-First MVVM (Model-View-ViewModel)** architectural pattern. The app achieves reactive state coordination across independent modules through a decoupled, provider-injected communication model.
 
-### Clean Code Highlight: Reactive Dependency Injection
 
-Instead of tightly coupling features, the app leverages `ChangeNotifierProxyProvider2` in [providers.dart](lib/providers.dart) to reactively feed settings and audio configurations into the Pomodoro core:
 
-```dart
-ChangeNotifierProxyProvider2<SettingsProvider, AudioProvider, TimerProvider>(
-  create: (_) => TimerProvider(),
-  update: (_, settings, audio, timer) =>
-      timer!..setDependencies(settings, audio),
-)
-```
-
-This guarantees:
-1. **Unidirectional Data Flow**: Modifying round lengths in the `Settings` screen or choosing a background sound immediately updates the active `TimerProvider` state without manual event bus propagation.
-2. **Coordinated Background Behavior**: The active session automatically coordinates background audio playback states (pausing on breaks or session pauses, resuming on deep work) dynamically.
-
----
 
 ## 📂 Project Structure
 
