@@ -3,7 +3,6 @@ import 'package:deep_focus/core/theme/app_theme.dart';
 import 'package:deep_focus/navigation.dart';
 import 'package:deep_focus/providers.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
