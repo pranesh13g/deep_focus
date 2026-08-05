@@ -12,16 +12,20 @@ class AudioProvider extends ChangeNotifier {
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
 
+  // Whether the focus session has sound enabled (only affects focus session,
+  // NOT sounds-library preview playback).
+  bool _isFocusSoundEnabled = false;
+
   SoundModel? get currentSound => _currentSound;
   SoundModel? get selectedForFocus => _selectedForFocus;
   bool get isPlaying => _isPlaying;
   bool get isLoading => _isLoading;
   Duration get position => _position;
   Duration get duration => _duration;
+  bool get isFocusSoundEnabled => _isFocusSoundEnabled;
   AudioPlayer get player => _player;
 
   AudioProvider() {
-    // Default: first essential tone is selected for Focus
     _selectedForFocus = essentialTones.first;
 
     _player.playerStateStream.listen((state) {
@@ -45,19 +49,17 @@ class AudioProvider extends ChangeNotifier {
     });
   }
 
-  /// Play a sound from the Sounds library list.
+  // ── Sounds Library (preview) playback ─────────────────────────────────────
+
+  /// Load and play a sound. If the same sound is already loaded, just resume.
   Future<void> play(SoundModel sound) async {
     if (_currentSound?.id == sound.id) {
-      if (!_isPlaying) {
-        await _player.play();
-      }
+      if (!_player.playing) await _player.play();
       return;
     }
-
     _currentSound = sound;
     _isLoading = true;
     notifyListeners();
-
     try {
       await _player.setAsset(sound.assetPath);
       await _player.setLoopMode(LoopMode.one);
@@ -68,51 +70,37 @@ class AudioProvider extends ChangeNotifier {
     }
   }
 
-  /// Toggle a sound (play if different or paused, pause if same and playing)
-  Future<void> togglePlay(SoundModel sound) async {
-    if (_currentSound?.id == sound.id) {
-      await togglePlayPause();
-    } else {
-      await play(sound);
-    }
-  }
-
-  /// Select a sound to use on the Focus screen (does NOT auto-play).
-  void selectForFocus(SoundModel sound) {
+  /// Tap handler for a tile: select for focus + play/pause toggle.
+  /// Does NOT call notifyListeners mid-operation to avoid rebuild races.
+  Future<void> selectAndToggle(SoundModel sound) async {
     _selectedForFocus = sound;
-    notifyListeners();
-  }
 
-  bool _isFocusSoundEnabled = false;
-  bool get isFocusSoundEnabled => _isFocusSoundEnabled;
-
-  Future<void> toggleFocusSound() async {
-    _isFocusSoundEnabled = !_isFocusSoundEnabled;
-    if (_isFocusSoundEnabled) {
-      await playSelected();
+    if (_currentSound?.id == sound.id) {
+      // Same sound already loaded — toggle with live player state
+      if (_player.playing) {
+        await _player.pause();
+      } else {
+        await _player.play();
+      }
     } else {
-      await pauseAudio();
+      // Different sound — load and play
+      _currentSound = sound;
+      _isLoading = true;
+      notifyListeners();
+      try {
+        await _player.setAsset(sound.assetPath);
+        await _player.setLoopMode(LoopMode.one);
+        await _player.play();
+      } catch (e) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
-    notifyListeners();
   }
 
-  /// Called by TimerProvider when user resumes the session.
-  Future<void> playSelected() async {
-    if (!_isFocusSoundEnabled) {
-      await pauseAudio();
-      return;
-    }
-    final sound = _selectedForFocus;
-    if (sound == null) return;
-    await play(sound);
-  }
-
-  Future<void> playBreakSound() async {
-    await play(clockTickingSound);
-  }
-
+  /// Mini-player play/pause button.
   Future<void> togglePlayPause() async {
-    if (_isPlaying) {
+    if (_player.playing) {
       await _player.pause();
     } else {
       await _player.play();
@@ -123,14 +111,55 @@ class AudioProvider extends ChangeNotifier {
     await _player.pause();
   }
 
+  // ── Focus session sound ────────────────────────────────────────────────────
+
+  /// Select a sound for the focus session without affecting current playback.
+  void selectForFocus(SoundModel sound) {
+    _selectedForFocus = sound;
+    notifyListeners();
+  }
+
+  Future<void> toggleFocusSound() async {
+    _isFocusSoundEnabled = !_isFocusSoundEnabled;
+    if (_isFocusSoundEnabled) {
+      await _playForFocusSession();
+    } else {
+      await pauseAudio();
+    }
+    notifyListeners();
+  }
+
+  /// Called by TimerProvider when the work phase starts/resumes.
+  /// Only plays if the user has enabled focus sound.
+  Future<void> playSelected() async {
+    if (!_isFocusSoundEnabled) {
+      await pauseAudio();
+      return;
+    }
+    final sound = _selectedForFocus;
+    if (sound == null) return;
+    await play(sound);
+  }
+
+  Future<void> _playForFocusSession() async {
+    final sound = _selectedForFocus;
+    if (sound == null) return;
+    await play(sound);
+  }
+
+  Future<void> playBreakSound() async {
+    await play(clockTickingSound);
+  }
+
+  // ── Skip / Next / Prev ─────────────────────────────────────────────────────
+
   Future<void> playNext() async {
     if (_currentSound == null) return;
     final index = allSounds.indexWhere((s) => s.id == _currentSound!.id);
     if (index != -1) {
-      final nextIndex = (index + 1) % allSounds.length;
-      final nextSound = allSounds[nextIndex];
-      _selectedForFocus = nextSound; // Select also
-      await play(nextSound);
+      final next = allSounds[(index + 1) % allSounds.length];
+      _selectedForFocus = next;
+      await play(next);
     }
   }
 
@@ -138,10 +167,9 @@ class AudioProvider extends ChangeNotifier {
     if (_currentSound == null) return;
     final index = allSounds.indexWhere((s) => s.id == _currentSound!.id);
     if (index != -1) {
-      final prevIndex = (index - 1 + allSounds.length) % allSounds.length;
-      final prevSound = allSounds[prevIndex];
-      _selectedForFocus = prevSound; // Select also
-      await play(prevSound);
+      final prev = allSounds[(index - 1 + allSounds.length) % allSounds.length];
+      _selectedForFocus = prev;
+      await play(prev);
     }
   }
 
@@ -154,6 +182,8 @@ class AudioProvider extends ChangeNotifier {
     final newPos = _position - const Duration(seconds: 10);
     await _player.seek(newPos > Duration.zero ? newPos : Duration.zero);
   }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
 
   bool isCurrentlyPlaying(String id) => _currentSound?.id == id && _isPlaying;
   bool isCurrent(String id) => _currentSound?.id == id;

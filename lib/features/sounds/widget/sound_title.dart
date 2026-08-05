@@ -57,42 +57,40 @@ class SoundTile extends StatelessWidget {
         final isLoading = isCurrent && audioProvider.isLoading;
         final isSelectedForFocus = audioProvider.isSelectedForFocus(sound.id);
 
-        return GestureDetector(
-          onTap: () {
-            // Mark as selected for Focus AND play in the library
-            audioProvider.selectForFocus(sound);
-            audioProvider.togglePlay(sound);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-            decoration: BoxDecoration(
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          decoration: BoxDecoration(
+            color: isCurrent
+                ? AppColors.primary.withValues(alpha: 0.07)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
               color: isCurrent
-                  ? AppColors.primary.withValues(alpha: 0.07)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isCurrent
-                    ? AppColors.primary.withValues(alpha: 0.3)
-                    : AppColors.lightGray,
-                width: 1.2,
-              ),
-              boxShadow: isCurrent
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.08),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : [],
+                  ? AppColors.primary.withValues(alpha: 0.3)
+                  : AppColors.lightGray,
+              width: 1.2,
             ),
-            child: Row(
-              children: [
-                _buildIcon(sound.iconPath),
-                SizedBox(width: 14.w),
-                Expanded(
+            boxShadow: isCurrent
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Row(
+            children: [
+              _buildIcon(sound.iconPath),
+              SizedBox(width: 14.w),
+              // Tapping the text area selects for focus and plays
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => audioProvider.selectAndToggle(sound),
+                  behavior: HitTestBehavior.opaque,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -150,40 +148,35 @@ class SoundTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(width: 10.w),
-                // Play/Pause button
-                GestureDetector(
-                  onTap: () {
-                    audioProvider.selectForFocus(sound);
-                    audioProvider.togglePlay(sound);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: isCurrent ? AppColors.primary : AppColors.tertiary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: isLoading
-                        ? Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: isCurrent
-                                  ? Colors.white
-                                  : AppColors.primary,
-                            ),
-                          )
-                        : Icon(
-                            isPlaying ? Icons.pause : Icons.play_arrow,
-                            color: isCurrent ? Colors.white : AppColors.primary,
-                            size: 20,
-                          ),
+              ),
+              SizedBox(width: 10.w),
+              // Play/Pause button — standalone, does NOT bubble to a parent GestureDetector
+              GestureDetector(
+                onTap: () => audioProvider.selectAndToggle(sound),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: isCurrent ? AppColors.primary : AppColors.tertiary,
+                    shape: BoxShape.circle,
                   ),
+                  child: isLoading
+                      ? Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: isCurrent ? Colors.white : AppColors.primary,
+                          ),
+                        )
+                      : Icon(
+                          isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: isCurrent ? Colors.white : AppColors.primary,
+                          size: 20,
+                        ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },

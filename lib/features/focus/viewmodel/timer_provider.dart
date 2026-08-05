@@ -36,9 +36,8 @@ class TimerProvider extends ChangeNotifier {
     // INTERLINKING RULE: Ensure audio state matches session state when Focus screen is built.
     if (_isRunning) {
       _syncAudio();
-    } else {
-      _audio?.pauseAudio();
     }
+    // Do NOT pause audio here — user may be previewing sounds on the Sounds screen.
     notifyListeners();
   }
 
