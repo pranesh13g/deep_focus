@@ -1,16 +1,13 @@
 import 'package:deep_focus/core/constant/app_colors.dart';
-import 'package:deep_focus/features/about/viewmodel/about_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LegalSection extends StatelessWidget {
   const LegalSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final aboutProvider = context.read<AboutProvider>();
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -27,14 +24,19 @@ class LegalSection extends StatelessWidget {
           icon: Icons.security_outlined,
           title: 'Privacy Policy',
           subtitle: 'How we safeguard your focus data',
-          onTap: () => aboutProvider.launchLink('https://your-privacy-link.com'),
+          onTap: () => launchUrl(
+            Uri.parse('https://pranesh13g.github.io/deep-focus-privacy/'),
+            mode: LaunchMode.externalApplication,
+          ),
         ),
         SizedBox(height: 12.h),
         _LegalTile(
           icon: Icons.description_outlined,
           title: 'Terms & Conditions',
           subtitle: 'Our mutual commitment to deep work',
-          onTap: () => aboutProvider.launchLink('https://your-terms-link.com'),
+          onTap: () =>{}
+           
+        
         ),
       ],
     );

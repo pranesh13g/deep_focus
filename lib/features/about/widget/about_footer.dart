@@ -18,13 +18,13 @@ class AboutFooter extends StatelessWidget {
             ),
           ),
           SizedBox(height: 4.h),
-          Text(
-            'Created by HillStack',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: AppColors.textSecondary.withValues(alpha: 0.6),
-            ),
-          ),
+          // Text(
+          //   'Created by HillStack',
+          //   style: TextStyle(
+          //     fontSize: 12.sp,
+          //     color: AppColors.textSecondary.withValues(alpha: 0.6),
+          //   ),
+          // ),
         ],
       ),
     );
