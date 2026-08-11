@@ -13,32 +13,38 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+void main() {
+  // runZonedGuarded must wrap everything — including ensureInitialized and
+  // runApp — so that Flutter bindings and the app run in the same zone.
+  // Calling ensureInitialized() outside the zone and runApp() inside it
+  // causes a "Zone mismatch" fatal assertion.
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Pass all uncaught Flutter framework errors to Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  final prefs = await SharedPreferences.getInstance();
-  final isFirstLaunch = prefs.getBool('seen_splash') != true;
-  if (isFirstLaunch) {
-    await prefs.setBool('seen_splash', true);
-  }
+    // Pass all uncaught Flutter framework errors to Crashlytics
+    FlutterError.onError =
+        FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  // Catch uncaught async errors (e.g. in Futures, Streams outside Flutter)
-  await runZonedGuarded(() async {
-    NotificationService.init(); // Non-blocking init
+    final prefs = await SharedPreferences.getInstance();
+    final isFirstLaunch = prefs.getBool('seen_splash') != true;
+    if (isFirstLaunch) {
+      await prefs.setBool('seen_splash', true);
+    }
+
+    await NotificationService.init();
     await ScreenUtil.ensureScreenSize();
+
     runApp(
       MultiProvider(
         providers: AppProviders.allProviders,
         child: MyApp(showSplash: isFirstLaunch),
       ),
     );
-  }, FirebaseCrashlytics.instance.recordError);
+  }, (error, stack) => FirebaseCrashlytics.instance.recordError(error, stack, fatal: true));
 }
 
 class MyApp extends StatelessWidget {
