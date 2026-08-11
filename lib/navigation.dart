@@ -51,10 +51,6 @@ class _NavigationState extends State<Navigation> with WidgetsBindingObserver {
   }
 
   void onItemTapped(int index) {
-    if (index != selectedIndex) {
-      // STOP MUSIC when switching pages
-      context.read<AudioProvider>().pauseAudio();
-    }
     setState(() {
       selectedIndex = index;
     });

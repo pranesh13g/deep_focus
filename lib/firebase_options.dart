@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '457795647842',
     projectId: 'deep-focus-29216',
     storageBucket: 'deep-focus-29216.firebasestorage.app',
-    iosBundleId: 'com.example.deepFocus',
+    iosBundleId: 'com.pranesh.deepfocus',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '457795647842',
     projectId: 'deep-focus-29216',
     storageBucket: 'deep-focus-29216.firebasestorage.app',
-    iosBundleId: 'com.example.deepFocus',
+    iosBundleId: 'com.pranesh.deepfocus',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
