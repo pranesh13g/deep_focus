@@ -23,6 +23,7 @@ class TimerProvider extends ChangeNotifier {
   /// Syncs settings and audio provider from the UI layer.
   void setDependencies(SettingsProvider settings, AudioProvider audio) {
     final oldSettings = _settings;
+    final bool audioProviderChanged = _audio != audio;
     _settings = settings;
     _audio = audio;
 
@@ -33,11 +34,14 @@ class TimerProvider extends ChangeNotifier {
       }
     }
 
-    // INTERLINKING RULE: Ensure audio state matches session state when Focus screen is built.
-    if (_isRunning) {
+    // Only sync audio when the AudioProvider instance itself is replaced (first
+    // load or hot-restart), NOT on every notifyListeners() from AudioProvider.
+    // Calling _syncAudio() on every position/state update from AudioProvider
+    // immediately re-starts playback after the user manually pauses the sound.
+    if (_isRunning && audioProviderChanged) {
       _syncAudio();
     }
-    // Do NOT pause audio here — user may be previewing sounds on the Sounds screen.
+
     notifyListeners();
   }
 

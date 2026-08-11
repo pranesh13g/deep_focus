@@ -120,11 +120,15 @@ class AudioProvider extends ChangeNotifier {
   }
 
   Future<void> toggleFocusSound() async {
-    _isFocusSoundEnabled = !_isFocusSoundEnabled;
-    if (_isFocusSoundEnabled) {
-      await _playForFocusSession();
-    } else {
+    // Base the decision on the actual player state, not _isFocusSoundEnabled,
+    // so it stays correct even when the sounds-screen preview changed _isPlaying
+    // without touching _isFocusSoundEnabled.
+    if (_player.playing) {
+      _isFocusSoundEnabled = false;
       await pauseAudio();
+    } else {
+      _isFocusSoundEnabled = true;
+      await _playForFocusSession();
     }
     notifyListeners();
   }

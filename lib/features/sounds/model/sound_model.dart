@@ -50,15 +50,8 @@ final List<SoundModel> natureSounds = [
     id: 'ocean_waves',
     title: 'Ocean Waves',
     subtitle: 'Gentle rhythmic tide',
-    assetPath: 'assets/audio/ocean_weaves.mp3',
+    assetPath: 'assets/audio/ocean_waves.mp3',
     iconPath: 'ocean',
-  ),
-  SoundModel(
-    id: 'spring_forest',
-    title: 'Spring Forest',
-    subtitle: 'Birdsong and rustling leaves',
-    assetPath: 'assets/audio/spring_forest.mp3',
-    iconPath: 'forest',
   ),
   SoundModel(
     id: 'thunderstorm',

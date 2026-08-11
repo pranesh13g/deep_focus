@@ -4,11 +4,13 @@ import 'package:deep_focus/core/services/notification_service.dart';
 import 'package:deep_focus/core/theme/app_theme.dart';
 import 'package:deep_focus/navigation.dart';
 import 'package:deep_focus/providers.dart';
+import 'package:deep_focus/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -20,18 +22,28 @@ void main() async {
   // Pass all uncaught Flutter framework errors to Crashlytics
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('seen_splash') != true;
+  if (isFirstLaunch) {
+    await prefs.setBool('seen_splash', true);
+  }
+
   // Catch uncaught async errors (e.g. in Futures, Streams outside Flutter)
   await runZonedGuarded(() async {
     NotificationService.init(); // Non-blocking init
     await ScreenUtil.ensureScreenSize();
     runApp(
-      MultiProvider(providers: AppProviders.allProviders, child: const MyApp()),
+      MultiProvider(
+        providers: AppProviders.allProviders,
+        child: MyApp(showSplash: isFirstLaunch),
+      ),
     );
   }, FirebaseCrashlytics.instance.recordError);
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool showSplash;
+  const MyApp({super.key, required this.showSplash});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +59,7 @@ class MyApp extends StatelessWidget {
           home: child,
         );
       },
-      child: const Navigation(),
+      child: showSplash ? const SplashScreen() : const Navigation(),
     );
   }
 }
