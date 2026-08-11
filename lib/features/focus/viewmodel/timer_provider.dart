@@ -126,6 +126,25 @@ class TimerProvider extends ChangeNotifier {
   /// player button. Resets automatically when a new break phase starts.
   bool _breakSoundMutedByUser = false;
 
+  /// Toggles focus-session audio.
+  ///
+  /// When the session is **running**: gates on [_isFocusSoundEnabled] so that
+  /// resuming the session knows whether to restart audio.
+  ///
+  /// When the session is **paused**: simply plays/pauses directly without
+  /// touching [_isFocusSoundEnabled], so the user can preview the sound while
+  /// the timer is stopped without changing the enabled-on-resume preference.
+  void toggleFocusSessionSound() {
+    if (_audio == null) return;
+    if (_isRunning) {
+      // Running: delegate to AudioProvider which manages _isFocusSoundEnabled
+      _audio!.toggleFocusSound();
+    } else {
+      // Paused: just toggle playback directly, don't flip the enabled flag
+      _audio!.togglePlayPause();
+    }
+  }
+
   /// Toggles the clock-ticking sound during a break phase.
   /// Keeps [_breakSoundMutedByUser] in sync so "Resume Session" doesn't
   /// unexpectedly restart audio the user intentionally stopped.

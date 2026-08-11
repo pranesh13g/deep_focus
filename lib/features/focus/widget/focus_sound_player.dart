@@ -178,12 +178,7 @@ class _FocusSoundPlayerState extends State<FocusSoundPlayer> {
         GestureDetector(
           onTap: onTap ??
               () {
-                final audio = context.read<AudioProvider>();
-                if (sound.id == clockTickingSound.id) {
-                  audio.togglePlayPause();
-                } else {
-                  audio.toggleFocusSound();
-                }
+                context.read<TimerProvider>().toggleFocusSessionSound();
               },
           child: Container(
             width: 44.w,
