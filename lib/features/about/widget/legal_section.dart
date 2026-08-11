@@ -30,14 +30,6 @@ class LegalSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12.h),
-        _LegalTile(
-          icon: Icons.description_outlined,
-          title: 'Terms & Conditions',
-          subtitle: 'Our mutual commitment to deep work',
-          onTap: () =>{}
-           
-        
-        ),
       ],
     );
   }
