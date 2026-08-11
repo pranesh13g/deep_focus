@@ -36,6 +36,13 @@ final List<SoundModel> essentialTones = [
     assetPath: 'assets/audio/chill.mp3',
     iconPath: 'chill',
   ),
+  SoundModel(
+    id: 'piano',
+    title: 'Piano',
+    subtitle: 'Gentle piano for deep work',
+    assetPath: 'assets/audio/piano.mp3',
+    iconPath: 'piano',
+  ),
 ];
 
 final List<SoundModel> natureSounds = [
@@ -47,11 +54,25 @@ final List<SoundModel> natureSounds = [
     iconPath: 'rain',
   ),
   SoundModel(
-    id: 'ocean_waves',
-    title: 'Ocean Waves',
-    subtitle: 'Gentle rhythmic tide',
-    assetPath: 'assets/audio/ocean_waves.mp3',
-    iconPath: 'ocean',
+    id: 'calming_rain',
+    title: 'Calming Rain',
+    subtitle: 'Soft rain to ease your mind',
+    assetPath: 'assets/audio/calming_rain.mp3',
+    iconPath: 'calming_rain',
+  ),
+  SoundModel(
+    id: 'ocean_weaves',
+    title: 'Ocean Weaves',
+    subtitle: 'Deep rolling ocean swells',
+    assetPath: 'assets/audio/ocean_weaves.mp3',
+    iconPath: 'ocean_weaves',
+  ),
+  SoundModel(
+    id: 'birds',
+    title: 'Birds',
+    subtitle: 'Morning birdsong in nature',
+    assetPath: 'assets/audio/birdrs.mp3',
+    iconPath: 'birds',
   ),
   SoundModel(
     id: 'thunderstorm',

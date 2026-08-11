@@ -208,12 +208,18 @@ class _FocusSoundPlayerState extends State<FocusSoundPlayer> {
         return Icons.spa;
       case 'chill':
         return Icons.nightlife;
+      case 'piano':
+        return Icons.piano;
       case 'rain':
         return Icons.beach_access;
+      case 'calming_rain':
+        return Icons.water_drop;
       case 'ocean':
         return Icons.waves;
-      case 'forest':
-        return Icons.park;
+      case 'ocean_weaves':
+        return Icons.water;
+      case 'birds':
+        return Icons.flutter_dash;
       case 'thunder':
         return Icons.flash_on;
       case 'clock':

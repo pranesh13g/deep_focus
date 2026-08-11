@@ -16,18 +16,24 @@ class SoundTile extends StatelessWidget {
       'white': Icons.graphic_eq,
       'calm': Icons.spa,
       'chill': Icons.nightlife,
+      'piano': Icons.piano,
       'rain': Icons.beach_access,
+      'calming_rain': Icons.water_drop,
       'ocean': Icons.waves,
-      'forest': Icons.park,
+      'ocean_weaves': Icons.water,
+      'birds': Icons.flutter_dash,
       'thunder': Icons.flash_on,
     };
     final Map<String, Color> colorMap = {
       'white': const Color(0xFF78909C),
       'calm': const Color(0xFF81C784),
       'chill': const Color(0xFFBA68C8),
+      'piano': const Color(0xFF9575CD),
       'rain': const Color(0xFF4FC3F7),
+      'calming_rain': const Color(0xFF80DEEA),
       'ocean': const Color(0xFF4DB6AC),
-      'forest': const Color(0xFFAED581),
+      'ocean_weaves': const Color(0xFF26C6DA),
+      'birds': const Color(0xFFA5D6A7),
       'thunder': const Color(0xFFFFB74D),
     };
 
