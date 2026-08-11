@@ -110,11 +110,21 @@ class _FocusSoundPlayerState extends State<FocusSoundPlayer> {
         audio.isPlaying && audio.currentSound?.id == 'clock_ticking';
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-      child: _buildSoundRow(clockTickingSound, isPlaying, audio.isLoading),
+      child: _buildSoundRow(
+        clockTickingSound,
+        isPlaying,
+        audio.isLoading,
+        onTap: () => context.read<TimerProvider>().toggleBreakSound(),
+      ),
     );
   }
 
-  Widget _buildSoundRow(SoundModel sound, bool isPlaying, bool isLoading) {
+  Widget _buildSoundRow(
+    SoundModel sound,
+    bool isPlaying,
+    bool isLoading, {
+    VoidCallback? onTap,
+  }) {
     return Row(
       children: [
         // Thumbnail / icon
@@ -166,14 +176,15 @@ class _FocusSoundPlayerState extends State<FocusSoundPlayer> {
 
         // Play/Pause button
         GestureDetector(
-          onTap: () {
-            final audio = context.read<AudioProvider>();
-            if (sound.id == clockTickingSound.id) {
-              audio.togglePlayPause();
-            } else {
-              audio.toggleFocusSound();
-            }
-          },
+          onTap: onTap ??
+              () {
+                final audio = context.read<AudioProvider>();
+                if (sound.id == clockTickingSound.id) {
+                  audio.togglePlayPause();
+                } else {
+                  audio.toggleFocusSound();
+                }
+              },
           child: Container(
             width: 44.w,
             height: 44.w,

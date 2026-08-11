@@ -72,6 +72,7 @@ class TimerProvider extends ChangeNotifier {
   int get remainingSeconds => _remainingSeconds;
   bool get isRunning => _isRunning;
   TimerPhase get phase => _phase;
+  bool get breakSoundMutedByUser => _breakSoundMutedByUser;
 
   String get formattedTime {
     final minutes = _remainingSeconds ~/ 60;
@@ -115,7 +116,27 @@ class TimerProvider extends ChangeNotifier {
     if (_phase == TimerPhase.work) {
       _audio?.playSelected();
     } else {
-      _audio?.playBreakSound();
+      if (!_breakSoundMutedByUser) {
+        _audio?.playBreakSound();
+      }
+    }
+  }
+
+  /// Whether the user explicitly paused the break sound via the in-session
+  /// player button. Resets automatically when a new break phase starts.
+  bool _breakSoundMutedByUser = false;
+
+  /// Toggles the clock-ticking sound during a break phase.
+  /// Keeps [_breakSoundMutedByUser] in sync so "Resume Session" doesn't
+  /// unexpectedly restart audio the user intentionally stopped.
+  void toggleBreakSound() {
+    if (_audio == null) return;
+    if (_audio!.isPlaying) {
+      _breakSoundMutedByUser = true;
+      _audio!.pauseAudio();
+    } else {
+      _breakSoundMutedByUser = false;
+      _audio!.playBreakSound();
     }
   }
 
@@ -163,6 +184,7 @@ class TimerProvider extends ChangeNotifier {
         _remainingSeconds = isLongBreak
             ? settings.longBreakSeconds
             : settings.shortBreakSeconds;
+        _breakSoundMutedByUser = false; // fresh break — always auto-play
         break;
 
       case TimerPhase.shortBreak:
