@@ -18,6 +18,11 @@ class TimerProvider extends ChangeNotifier {
   bool _isRunning = false;
   Timer? _timer;
 
+  /// Timestamp recorded when the app moves to background while timer is running.
+  /// Used to calculate elapsed time on resume so the timer stays accurate even
+  /// when the Dart isolate is throttled or the screen is off.
+  DateTime? _backgroundedAt;
+
   TimerProvider();
 
   /// Syncs settings and audio provider from the UI layer.
@@ -198,11 +203,73 @@ class TimerProvider extends ChangeNotifier {
   void _triggerNotification(String title, String body) {
     HapticFeedback.vibrate(); // Immediate vibration
     NotificationService.showNotification(
-      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      id: _notificationId++,
       title: title,
       body: body,
     );
   }
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
+  /// Call from [WidgetsBindingObserver.didChangeAppLifecycleState] when the
+  /// app enters [AppLifecycleState.paused].
+  ///
+  /// Cancels the [Timer.periodic] (preventing Dart-isolate drift) and records
+  /// the wall-clock time so [handleForeground] can fast-forward correctly.
+  void handleBackground() {
+    if (!_isRunning) return;
+    _timer?.cancel();
+    _timer = null;
+    _backgroundedAt = DateTime.now();
+    _audio?.pauseAudio();
+    // Keep _isRunning = true so the UI still shows the running state on resume.
+  }
+
+  /// Call from [WidgetsBindingObserver.didChangeAppLifecycleState] when the
+  /// app enters [AppLifecycleState.resumed].
+  ///
+  /// Calculates the real elapsed seconds since [handleBackground] was called,
+  /// fast-forwards through as many phase transitions as needed, fires any
+  /// missed notifications, then restarts the tick timer.
+  void handleForeground() {
+    final bg = _backgroundedAt;
+    if (!_isRunning || bg == null) return;
+    _backgroundedAt = null;
+
+    final elapsed = DateTime.now().difference(bg).inSeconds;
+    _applyElapsed(elapsed);
+
+    if (_isRunning) {
+      _startTimer();
+      _syncAudio();
+    }
+  }
+
+  /// Advances the timer state by [seconds], crossing phase boundaries as
+  /// needed.  Each crossed boundary fires a notification just as the live
+  /// timer would have.
+  void _applyElapsed(int seconds) {
+    int remaining = seconds;
+
+    while (remaining > 0 && _isRunning) {
+      if (remaining < _remainingSeconds) {
+        // Elapsed time fits within the current phase — simply subtract.
+        _remainingSeconds -= remaining;
+        remaining = 0;
+      } else {
+        // Elapsed time exhausts this phase; advance and keep consuming.
+        remaining -= _remainingSeconds;
+        _remainingSeconds = 0;
+        _advancePhase();
+        // _advancePhase may set _isRunning = false (session complete); if so
+        // the while-loop exits naturally.
+      }
+    }
+
+    notifyListeners();
+  }
+
+  int _notificationId = 0;
 
   @override
   void dispose() {

@@ -43,9 +43,10 @@ class _NavigationState extends State<Navigation> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      // STOP MUSIC and CLOCK only when app is fully backgrounded
       context.read<AudioProvider>().pauseAudio();
-      context.read<TimerProvider>().pause();
+      context.read<TimerProvider>().handleBackground();
+    } else if (state == AppLifecycleState.resumed) {
+      context.read<TimerProvider>().handleForeground();
     }
   }
 
