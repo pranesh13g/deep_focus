@@ -14,16 +14,41 @@ class TimerProvider extends ChangeNotifier {
 
   int _currentRound = 1;
   TimerPhase _phase = TimerPhase.work;
-  int _remainingSeconds = 1500; // Default 25 mins
   bool _isRunning = false;
   Timer? _timer;
 
-  /// Timestamp recorded when the app moves to background while timer is running.
-  /// Used to calculate elapsed time on resume so the timer stays accurate even
-  /// when the Dart isolate is throttled or the screen is off.
+  // ── Wall-clock timing anchors ──────────────────────────────────────────────
+
+  /// Total seconds the current phase lasts. Set when the phase is entered.
+  int _phaseTotalSeconds = 1500;
+
+  /// Seconds already elapsed in this phase before the current run segment.
+  /// Accumulates across pause/resume cycles within the same phase.
+  int _elapsedBeforeStart = 0;
+
+  /// Wall-clock time when the current run segment started (null when paused).
+  /// [_updateTimer] derives remaining time from this anchor rather than
+  /// counting periodic callbacks.
+  DateTime? _runStartedAt;
+
+  /// Timestamp recorded when the app moves to background while the timer is
+  /// running. Used by [handleForeground] to fast-forward by real wall time.
   DateTime? _backgroundedAt;
 
+  /// Derived remaining seconds – updated by [_updateTimer] every 100 ms and
+  /// kept in sync with [_elapsedBeforeStart] + real wall-clock elapsed.
+  int _remainingSeconds = 1500;
+
+  /// Last elapsed-second boundary for which a tick sound was played.
+  /// Guards against playing more than one tick per elapsed second.
+  int _lastTickSecond = -1;
+
+  // ── Whether the user explicitly paused the break sound ────────────────────
+  bool _breakSoundMutedByUser = false;
+
   TimerProvider();
+
+  // ── Dependency injection ───────────────────────────────────────────────────
 
   /// Syncs settings and audio provider from the UI layer.
   void setDependencies(SettingsProvider settings, AudioProvider audio) {
@@ -32,17 +57,19 @@ class TimerProvider extends ChangeNotifier {
     _settings = settings;
     _audio = audio;
 
-    // Only update remaining seconds if settings actually changed and timer isn't running
+    // Only reset the phase duration if settings changed and timer is paused.
     if (!_isRunning) {
       if (oldSettings == null || _hasDurationsChanged(oldSettings, settings)) {
-        _remainingSeconds = _getInitialSeconds(settings, _phase);
+        _phaseTotalSeconds = _getInitialSeconds(settings, _phase);
+        _remainingSeconds = _phaseTotalSeconds;
+        _elapsedBeforeStart = 0;
+        _runStartedAt = null;
+        _lastTickSecond = -1;
       }
     }
 
-    // Only sync audio when the AudioProvider instance itself is replaced (first
-    // load or hot-restart), NOT on every notifyListeners() from AudioProvider.
-    // Calling _syncAudio() on every position/state update from AudioProvider
-    // immediately re-starts playback after the user manually pauses the sound.
+    // Sync audio only when the AudioProvider instance itself changes (first
+    // load / hot-restart), not on every position/state update it broadcasts.
     if (_isRunning && audioProviderChanged) {
       _syncAudio();
     }
@@ -67,6 +94,8 @@ class TimerProvider extends ChangeNotifier {
         old.longBreakSeconds != current.longBreakSeconds;
   }
 
+  // ── Getters ────────────────────────────────────────────────────────────────
+
   int get currentRound => _currentRound;
   int get totalRounds => _settings?.totalRounds ?? 4;
   int get remainingSeconds => _remainingSeconds;
@@ -75,8 +104,9 @@ class TimerProvider extends ChangeNotifier {
   bool get breakSoundMutedByUser => _breakSoundMutedByUser;
 
   String get formattedTime {
-    final minutes = _remainingSeconds ~/ 60;
-    final seconds = _remainingSeconds % 60;
+    final s = _remainingSeconds.clamp(0, _phaseTotalSeconds);
+    final minutes = s ~/ 60;
+    final seconds = s % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
@@ -95,19 +125,30 @@ class TimerProvider extends ChangeNotifier {
   }
 
   // ── Controls ───────────────────────────────────────────────────────────────
+
   void togglePause() {
-    _isRunning = !_isRunning;
     if (_isRunning) {
+      pause();
+    } else {
+      _isRunning = true;
       _startTimer();
       _syncAudio();
-    } else {
-      pause();
     }
   }
 
   void pause() {
+    if (!_isRunning) return;
+
+    // Capture elapsed wall time so it is not lost across this pause.
+    if (_runStartedAt != null) {
+      _elapsedBeforeStart +=
+          DateTime.now().difference(_runStartedAt!).inSeconds;
+      _runStartedAt = null;
+    }
+
     _isRunning = false;
     _timer?.cancel();
+    _timer = null;
     _audio?.pauseAudio();
     notifyListeners();
   }
@@ -122,32 +163,21 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
-  /// Whether the user explicitly paused the break sound via the in-session
-  /// player button. Resets automatically when a new break phase starts.
-  bool _breakSoundMutedByUser = false;
-
   /// Toggles focus-session audio.
   ///
-  /// When the session is **running**: gates on [_isFocusSoundEnabled] so that
-  /// resuming the session knows whether to restart audio.
-  ///
-  /// When the session is **paused**: simply plays/pauses directly without
-  /// touching [_isFocusSoundEnabled], so the user can preview the sound while
-  /// the timer is stopped without changing the enabled-on-resume preference.
+  /// Running → delegates to AudioProvider (manages its own enabled flag).
+  /// Paused  → direct play/pause without touching the enabled flag so the user
+  ///           can preview sound while stopped without changing resume behaviour.
   void toggleFocusSessionSound() {
     if (_audio == null) return;
     if (_isRunning) {
-      // Running: delegate to AudioProvider which manages _isFocusSoundEnabled
       _audio!.toggleFocusSound();
     } else {
-      // Paused: just toggle playback directly, don't flip the enabled flag
       _audio!.togglePlayPause();
     }
   }
 
   /// Toggles the clock-ticking sound during a break phase.
-  /// Keeps [_breakSoundMutedByUser] in sync so "Resume Session" doesn't
-  /// unexpectedly restart audio the user intentionally stopped.
   void toggleBreakSound() {
     if (_audio == null) return;
     if (_audio!.isPlaying) {
@@ -159,13 +189,19 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
-  /// Reset: stop timer, go back to round 1 work phase, stay paused.
+  /// Reset: stop timer, return to round 1 work phase, stay paused.
   void reset() {
     _timer?.cancel();
+    _timer = null;
     _isRunning = false;
     _currentRound = 1;
     _phase = TimerPhase.work;
-    _remainingSeconds = _settings?.workDurationSeconds ?? 1500;
+    _phaseTotalSeconds = _settings?.workDurationSeconds ?? 1500;
+    _remainingSeconds = _phaseTotalSeconds;
+    _elapsedBeforeStart = 0;
+    _runStartedAt = null;
+    _backgroundedAt = null;
+    _lastTickSecond = -1;
     _audio?.pauseAudio();
     notifyListeners();
   }
@@ -173,22 +209,63 @@ class TimerProvider extends ChangeNotifier {
   /// Skip: jump to the next phase immediately.
   void skip() {
     _timer?.cancel();
+    _timer = null;
+    _runStartedAt = null;
     _advancePhase();
   }
 
-  // ── Internal ───────────────────────────────────────────────────────────────
+  // ── Core timer loop ────────────────────────────────────────────────────────
+
+  /// Starts (or restarts) the 100 ms refresh loop. Records a fresh
+  /// [_runStartedAt] anchor so every [_updateTimer] call measures wall time
+  /// from a known point rather than counting callback firings.
   void _startTimer() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_remainingSeconds > 0) {
-        _remainingSeconds--;
-        notifyListeners();
-      } else {
-        _timer?.cancel();
-        _advancePhase();
-      }
-    });
+    _runStartedAt = DateTime.now();
+
+    _timer = Timer.periodic(
+      const Duration(milliseconds: 100),
+      (_) => _updateTimer(),
+    );
   }
+
+  /// Called ~10× per second. Derives remaining time from real wall-clock
+  /// elapsed time – never by counting how many times this callback fires.
+  void _updateTimer() {
+    if (!_isRunning || _runStartedAt == null) return;
+
+    final wallElapsed =
+        DateTime.now().difference(_runStartedAt!).inSeconds;
+    final totalElapsed = _elapsedBeforeStart + wallElapsed;
+    final newRemaining = _phaseTotalSeconds - totalElapsed;
+
+    // Phase complete.
+    if (newRemaining <= 0) {
+      _remainingSeconds = 0;
+      notifyListeners();
+      _timer?.cancel();
+      _timer = null;
+      _runStartedAt = null;
+      _advancePhase();
+      return;
+    }
+
+    // Update display only when the second changes (avoids noisy rebuilds).
+    if (newRemaining != _remainingSeconds) {
+      _remainingSeconds = newRemaining;
+      notifyListeners();
+    }
+
+    // Tick sound: fire exactly once per elapsed second, anchored to the same
+    // wall-clock calculation used for the display – never to callback count.
+    if (totalElapsed != _lastTickSecond) {
+      _lastTickSecond = totalElapsed;
+      // TODO: uncomment when a single-shot tick asset is added:
+      // _audio?.playTick();
+    }
+  }
+
+  // ── Phase transitions ──────────────────────────────────────────────────────
 
   void _advancePhase() {
     final settings = _settings;
@@ -200,10 +277,10 @@ class TimerProvider extends ChangeNotifier {
       case TimerPhase.work:
         final isLongBreak = _currentRound % settings.totalRounds == 0;
         _phase = isLongBreak ? TimerPhase.longBreak : TimerPhase.shortBreak;
-        _remainingSeconds = isLongBreak
+        _phaseTotalSeconds = isLongBreak
             ? settings.longBreakSeconds
             : settings.shortBreakSeconds;
-        _breakSoundMutedByUser = false; // fresh break — always auto-play
+        _breakSoundMutedByUser = false; // fresh break – always auto-play
         break;
 
       case TimerPhase.shortBreak:
@@ -211,38 +288,47 @@ class TimerProvider extends ChangeNotifier {
         if (_currentRound < settings.totalRounds) {
           _currentRound++;
         } else {
+          // All rounds complete – session finished.
           _currentRound = 1;
           _isRunning = false;
           _phase = TimerPhase.work;
-          _remainingSeconds = settings.workDurationSeconds;
+          _phaseTotalSeconds = settings.workDurationSeconds;
+          _remainingSeconds = _phaseTotalSeconds;
+          _elapsedBeforeStart = 0;
+          _runStartedAt = null;
+          _lastTickSecond = -1;
           _audio?.pauseAudio();
           notifyListeners();
           return;
         }
         _phase = TimerPhase.work;
-        _remainingSeconds = settings.workDurationSeconds;
+        _phaseTotalSeconds = settings.workDurationSeconds;
         break;
     }
+
+    // Reset elapsed-state for the new phase.
+    _remainingSeconds = _phaseTotalSeconds;
+    _elapsedBeforeStart = 0;
+    _runStartedAt = null;
+    _lastTickSecond = -1;
 
     if (oldPhase == TimerPhase.work) {
       final isLong = _phase == TimerPhase.longBreak;
       _triggerNotification(
-        isLong ? 'Full Break Started' : ' Quick Break Started',
-        isLong
-            ? 'Take a good rest. You earned it!'
-            : 'Stretch a bit and relax.',
+        isLong ? 'Full Break Started' : 'Quick Break Started',
+        isLong ? 'Take a good rest. You earned it!' : 'Stretch a bit and relax.',
       );
     }
 
     if (_isRunning) {
-      _startTimer();
+      _startTimer(); // creates a fresh _runStartedAt for the new phase
       _syncAudio();
     }
     notifyListeners();
   }
 
   void _triggerNotification(String title, String body) {
-    HapticFeedback.vibrate(); // Immediate vibration
+    HapticFeedback.vibrate();
     NotificationService.showNotification(
       id: _notificationId++,
       title: title,
@@ -250,28 +336,35 @@ class TimerProvider extends ChangeNotifier {
     );
   }
 
-  // ── Lifecycle ──────────────────────────────────────────────────────────────
+  // ── App lifecycle ──────────────────────────────────────────────────────────
 
-  /// Call from [WidgetsBindingObserver.didChangeAppLifecycleState] when the
-  /// app enters [AppLifecycleState.paused].
+  /// Call from [WidgetsBindingObserver] when the app enters
+  /// [AppLifecycleState.paused].
   ///
-  /// Cancels the [Timer.periodic] (preventing Dart-isolate drift) and records
-  /// the wall-clock time so [handleForeground] can fast-forward correctly.
+  /// Captures the current elapsed time into [_elapsedBeforeStart], cancels the
+  /// refresh loop, and records the wall-clock time for [handleForeground].
   void handleBackground() {
     if (!_isRunning) return;
+
+    // Freeze elapsed so far into the accumulator.
+    if (_runStartedAt != null) {
+      _elapsedBeforeStart +=
+          DateTime.now().difference(_runStartedAt!).inSeconds;
+      _runStartedAt = null;
+    }
+
     _timer?.cancel();
     _timer = null;
     _backgroundedAt = DateTime.now();
     _audio?.pauseAudio();
-    // Keep _isRunning = true so the UI still shows the running state on resume.
+    // Keep _isRunning = true; the UI shows the running state on resume.
   }
 
-  /// Call from [WidgetsBindingObserver.didChangeAppLifecycleState] when the
-  /// app enters [AppLifecycleState.resumed].
+  /// Call from [WidgetsBindingObserver] when the app enters
+  /// [AppLifecycleState.resumed].
   ///
-  /// Calculates the real elapsed seconds since [handleBackground] was called,
-  /// fast-forwards through as many phase transitions as needed, fires any
-  /// missed notifications, then restarts the tick timer.
+  /// Calculates real wall-clock elapsed since [handleBackground], fast-forwards
+  /// through phase boundaries as needed, then restarts the timer.
   void handleForeground() {
     final bg = _backgroundedAt;
     if (!_isRunning || bg == null) return;
@@ -286,24 +379,28 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
-  /// Advances the timer state by [seconds], crossing phase boundaries as
-  /// needed.  Each crossed boundary fires a notification just as the live
-  /// timer would have.
+  /// Advances the timer by [seconds] of real elapsed time, crossing phase
+  /// boundaries as needed and firing a notification at each boundary.
   void _applyElapsed(int seconds) {
     int remaining = seconds;
 
     while (remaining > 0 && _isRunning) {
-      if (remaining < _remainingSeconds) {
-        // Elapsed time fits within the current phase — simply subtract.
-        _remainingSeconds -= remaining;
+      // How much time is left in the current phase from the accumulated state?
+      final phaseRemaining = _phaseTotalSeconds - _elapsedBeforeStart;
+
+      if (remaining < phaseRemaining) {
+        // Fits within the current phase.
+        _elapsedBeforeStart += remaining;
+        _remainingSeconds = _phaseTotalSeconds - _elapsedBeforeStart;
         remaining = 0;
       } else {
-        // Elapsed time exhausts this phase; advance and keep consuming.
-        remaining -= _remainingSeconds;
+        // Exhausts this phase; advance and keep consuming.
+        remaining -= phaseRemaining;
+        _elapsedBeforeStart = _phaseTotalSeconds; // mark phase as fully elapsed
         _remainingSeconds = 0;
         _advancePhase();
-        // _advancePhase may set _isRunning = false (session complete); if so
-        // the while-loop exits naturally.
+        // _advancePhase resets _elapsedBeforeStart for the new phase.
+        // If _isRunning became false (session over), the while-loop exits.
       }
     }
 
